@@ -1,0 +1,46 @@
+{
+  "items": [
+    {
+      "id": "bj-road-space-2024",
+      "title": "城市道路空间规划设计标准",
+      "standard_id": "DB11/T 1116-2024",
+      "published": "2024-04-01",
+      "effective": "2024-10-01",
+      "verified_on": "2026-10-12",
+      "url": "https://ghzrzyw.beijing.gov.cn/biaozhunguanli/bz/szjgdjt/202406/t20240603_3703097.html",
+      "pdf_url": "https://ghzrzyw.beijing.gov.cn/biaozhunguanli/bz/szjgdjt/202406/P020240603566610400349.pdf",
+      "evidence_status": "official_full_text_read; table_4.6.1_visually_checked",
+      "summary": "按道路等级、交通与场地条件确定断面；道路边界、车行道边界和规划红线不能混用。4.6.1 及 4.6.2–4.6.4 包含人行道宽度与特定情形。",
+      "pages": {
+        "section_selection": 19,
+        "redline": 20,
+        "sidewalk": 21
+      },
+      "rights": "仅分发出处与自有规则解释；未打包标准全文",
+      "status": "现行（国家标准信息平台本次核验）",
+      "status_url": "https://std.samr.gov.cn/db/search/stdDBDetailed?id=16BF8BCA4B144E56E06397BE0A0A8741",
+      "replaces": "DB11/1116-2014"
+    },
+    {
+      "id": "bj-regulatory-management-2024",
+      "title": "北京市控制性详细规划实施管理办法",
+      "standard_id": "京规自发〔2024〕317号",
+      "published": "2024-12-31",
+      "verified_on": "2026-10-12",
+      "url": "https://www.beijing.gov.cn/zhengce/zhengcefagui/202504/t20250403_4055742.html",
+      "evidence_status": "official_page_read",
+      "summary": "控规成果由管控图则、引导导则和管理规则共同组成。CAD几何图仅覆盖部分表达，不能替代已批准控规、实施管理或审查。",
+      "rights": "仅元数据、链接与自有摘要"
+    },
+    {
+      "id": "bj-subcenter-regulatory-atlas",
+      "title": "北京城市副中心控制性详细规划（街区层面）（2016年—2035年）规划图则",
+      "published": "2019-01-04",
+      "verified_on": "2026-10-12",
+      "url": "https://ghzrzyw.beijing.gov.cn/zhengwuxinxi/ghcg/csfzxgh/201912/t20191213_1165342.html",
+      "evidence_status": "official_index_read; individual_drawings_not_yet_examined",
+      "summary": "可定位代表性街区图则用于表达体系参考；具体地块与后续调整版本须另核。不能从索引声称已提取图面规范。",
+      "rights": "仅元数据与官方链接"
+    }
+  ]
+}

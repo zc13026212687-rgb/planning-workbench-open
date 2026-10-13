@@ -1,0 +1,11 @@
+{
+  "id": "road-review-template",
+  "name": "教师道路平面校核模板",
+  "version": "0.1.0",
+  "description": "读取明确道路参数并调用既有几何执行器，保留教学来源与错误门槛。",
+  "executor": "geometry",
+  "permissions": ["project:read", "artifact:write"],
+  "input_schema": "schema.json",
+  "schema_enforcement": "json_schema_draft_2020_12_and_registered_executor",
+  "source": "original_local_teaching_template"
+}

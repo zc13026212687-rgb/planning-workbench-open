@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Road cross section parameters; generator independently validates inputs",
+  "type": "object",
+  "required": ["kind", "units", "coordinate_reference", "reference_elevation", "slope_convention", "components"],
+  "properties": {
+    "kind": {"const": "road_cross_section"},
+    "units": {"const": "m"},
+    "coordinate_reference": {"const": "local_cartesian"},
+    "reference_elevation": {"type": "number", "minimum": -10000000, "maximum": 10000000},
+    "elevation_reference": {"type": "string"},
+    "slope_convention": {"const": "outward_rise_percent"},
+    "synthetic": {"type": "boolean"},
+    "components": {"type": "array", "minItems": 1, "maxItems": 100, "items": {
+      "type": "object", "required": ["id", "side", "order", "width", "slope_percent"],
+      "properties": {
+        "id": {"type": "string", "minLength": 1},
+        "name": {"type": "string"},
+        "side": {"enum": ["left", "right"]},
+        "order": {"type": "integer", "minimum": 0},
+        "role": {"enum": ["sidewalk", "cycleway", "carriageway", "median", "greenbelt", null]},
+        "width": {"type": "number", "exclusiveMinimum": 0, "maximum": 10000},
+        "slope_percent": {"type": "number", "minimum": -100, "maximum": 100},
+        "step_up": false,
+        "curb_height": false,
+        "thickness": false
+      }
+    }}
+  }
+}

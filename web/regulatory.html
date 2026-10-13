@@ -1,0 +1,325 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#163d49">
+<title>规绘｜地块与图则</title>
+<style>
+:root{--ink:#233b46;--muted:#637984;--line:#dce5e8;--paper:#fff;--bg:#f3f6f7;--teal:#167e75;--teal-soft:#e8f4f0;--blue:#426f91;--amber:#9b651d;--red:#b34040;--shadow:0 5px 22px #24444b09}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.55 "Microsoft YaHei","PingFang SC",system-ui,sans-serif}button,input,textarea,select{font:inherit}button,a,input,textarea,select{outline-offset:3px}button{border:1px solid var(--line);background:white;border-radius:7px;color:var(--ink);padding:9px 13px;cursor:pointer;font-weight:600;transition:background .15s,border-color .15s}button:hover:not(:disabled){background:#f1f7f7;border-color:#9ebbbd}button:disabled{opacity:.42;cursor:not-allowed}button.primary{background:var(--teal);border-color:var(--teal);color:white}button.primary:hover:not(:disabled){background:#116c64}button.dark{background:#284f5e;border-color:#284f5e;color:white}button.small{padding:5px 9px;font-size:12px}button.quiet{font-weight:400;background:transparent}a{color:var(--teal);text-decoration:none}a:hover{text-decoration:underline}input,select,textarea{border:1px solid #ccdadd;border-radius:6px;background:#fff;color:var(--ink);padding:8px 9px;min-width:0;width:100%}input:focus,select:focus,textarea:focus{border-color:var(--teal);outline:2px solid #167e7520}input[aria-invalid=true]{border-color:var(--red)}input:disabled,textarea:disabled,select:disabled{background:#f1f4f5;color:#819199}label{display:block;color:#5b707b;font-size:12px;margin:0 0 5px}h1,h2,h3,p{margin:0}h1{font-size:21px;font-weight:650;letter-spacing:.02em}h2{font-size:15px;font-weight:650}h3{font-size:13px;font-weight:650}.muted{color:var(--muted)}.small-text{font-size:12px}.mono{font-family:"Cascadia Code",Consolas,monospace}.tag{display:inline-flex;align-items:center;gap:5px;padding:3px 8px;border-radius:5px;background:#edf2f4;color:#58717c;font-size:11px;white-space:nowrap}.tag.teal{color:#16766e;background:var(--teal-soft)}.tag.warn{color:var(--amber);background:#fbf3e6}.tag.error{color:var(--red);background:#fbebeb}
+header{background:#fff;border-bottom:1px solid var(--line);padding:19px 26px 16px;display:flex;align-items:center;gap:22px;justify-content:space-between}.brand{display:flex;align-items:center;gap:13px}.brand-mark{width:37px;height:37px;border:2px solid var(--teal);border-radius:8px;display:grid;grid-template-columns:1fr 1fr;gap:4px;padding:6px;transform:rotate(-3deg)}.brand-mark i{background:#3b6976;border-radius:1px}.brand-mark i:nth-child(2){background:#b8d6d0}.brand-mark i:nth-child(3){background:#75aea4}.brand-copy .muted{font-size:11px;letter-spacing:.08em;margin-top:1px}.header-tools{display:flex;align-items:center;gap:9px;flex-wrap:wrap}.subbar{padding:12px 26px;background:#fbfcfc;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:20px}.steps{display:flex;gap:17px;align-items:center;font-size:12px;color:#6d8088}.steps span{display:flex;align-items:center;gap:7px}.steps b{color:var(--teal);font-size:11px;border:1px solid #b9d9d3;border-radius:50%;width:21px;height:21px;text-align:center;line-height:19px;font-weight:500}.steps em{font-style:normal;color:#afbdc1}.scope{font-size:11px;color:#6e8087}
+main{padding:18px 20px 26px;max-width:1920px;margin:auto}.intro{display:flex;justify-content:space-between;align-items:flex-end;margin:0 3px 15px;gap:16px}.intro h2{font-size:18px}.intro p{font-size:12px;color:var(--muted);margin-top:4px}.statusbar{min-height:22px;font-size:12px;display:flex;gap:7px;align-items:center}.dot{height:7px;width:7px;border-radius:50%;background:var(--teal)}.dot.busy{background:#bb8436;animation:pulse 1s infinite}@keyframes pulse{50%{opacity:.25}}.notice{padding:10px 13px;margin-bottom:13px;border:1px solid #e7d2ac;background:#fff9ee;border-radius:7px;color:#835b26;font-size:12px}.notice.error{background:#fff3f3;border-color:#e9c5c5;color:var(--red)}.hidden{display:none!important}
+.workspace{display:grid;grid-template-columns:278px minmax(360px,1fr) 328px;gap:15px;align-items:start}.column{display:flex;flex-direction:column;gap:13px}.panel{background:#fff;border:1px solid var(--line);border-radius:10px;box-shadow:var(--shadow);overflow:hidden}.panel-head{padding:14px 16px;border-bottom:1px solid #edf1f2;display:flex;align-items:center;justify-content:space-between;gap:10px}.panel-body{padding:15px 16px}.panel-note{font-size:11px;color:#778a92;line-height:1.65}.field{margin-bottom:12px}.field:last-child{margin-bottom:0}.field-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.field-grid .field{margin:0}.section-label{font-size:11px;color:#81929b;letter-spacing:.11em;text-transform:uppercase;margin-bottom:10px}.road-row{display:grid;grid-template-columns:minmax(0,1fr) 84px;align-items:center;gap:9px;padding:10px 0;border-bottom:1px solid #edf1f2}.road-row:first-child{padding-top:0}.road-row:last-child{border:0;padding-bottom:0}.road-name{font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.road-id{font-size:10px;color:#82949b;font-family:Consolas,monospace}.unit-input{position:relative}.unit-input input{padding-right:23px;text-align:right}.unit-input span{position:absolute;right:9px;top:9px;font-size:11px;color:#81959b;pointer-events:none}.wide{width:100%}.divider{height:1px;background:#e8eef0;margin:14px 0}.small-actions{display:flex;gap:7px;margin-top:11px}.small-actions button{flex:1}.form-note{font-size:11px;color:#82939a;margin:10px 0 12px}.selected-pill{font-size:11px;font-family:Consolas,monospace;background:#edf6f3;color:var(--teal);border-radius:4px;padding:3px 6px}
+.metric-strip{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}.metric{background:#fff;border:1px solid var(--line);border-radius:9px;padding:13px 14px;min-width:0}.metric-label{font-size:11px;color:var(--muted);white-space:nowrap}.metric-value{font-size:22px;color:#284a58;font-weight:600;line-height:1.4;margin-top:3px;font-variant-numeric:tabular-nums}.metric-unit{font-size:10px;color:#80949c;margin-left:4px;font-weight:400}.metric-foot{font-size:10px;color:#85969d;margin-top:2px}.preview-head{padding:12px 15px;display:flex;justify-content:space-between;align-items:center;gap:8px;border-bottom:1px solid var(--line)}.tabs{display:flex;padding:3px;background:#eef3f4;border-radius:7px;gap:3px}.tabs button{border:0;background:transparent;font-size:12px;padding:6px 11px;font-weight:400}.tabs button.active{background:#fff;box-shadow:0 1px 4px #29465115;color:var(--teal);font-weight:600}.zoom-controls{display:flex;gap:4px;align-items:center}.zoom-label{font-size:10px;color:#78909a;min-width:35px;text-align:center}.canvas-wrap{position:relative;min-height:475px;background:#fafcfc;overflow:auto;max-height:78vh}.drawing-inner{padding:23px 20px 15px;min-width:100%;min-height:465px;display:flex;align-items:center;justify-content:center}.drawing-inner svg{display:block;width:100%;min-width:100%;height:auto;max-height:650px;overflow:visible;font-family:"Microsoft YaHei",sans-serif}.map-empty{display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px;color:#85979e;min-height:430px;font-size:12px}.map-empty strong{font-size:15px;color:#70848e}.parcel-shape{cursor:pointer;transition:fill .15s}.parcel-shape:hover{fill:#c0e5db!important}.stale-overlay{position:absolute;top:13px;left:13px;z-index:2;background:#fff7e9;box-shadow:0 2px 5px #87642310;border:1px solid #ead4ac;border-radius:5px;color:#92631c;padding:6px 10px;font-size:11px;pointer-events:none}.north{position:absolute;right:16px;top:15px;color:#83979e;font-size:10px;display:flex;align-items:center;gap:4px}.north b{font-size:16px;color:#5f7b89;font-weight:400}.legend{display:flex;flex-wrap:wrap;align-items:center;gap:13px;padding:11px 16px;border-top:1px solid var(--line);font-size:10px;color:#6a7e88}.legend span{display:flex;align-items:center;gap:5px}.swatch{width:10px;height:10px;display:inline-block;border-radius:2px;border:1px solid #bed6d1;background:#dcece7}.swatch.road{background:#e3e8ec;border-color:#cbd4da}.swatch.hole{background:#fff;border:1px dashed #a4b8bf}.swatch.selected{background:#b4dbcf;border-color:#167e75}.preview-caption{padding:11px 16px;font-size:11px;line-height:1.7;color:#7a8d94;background:#fcfdfd;border-top:1px solid #edf1f2}.exportbar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:14px 15px}.export-buttons{display:flex;gap:8px;flex-wrap:wrap}.export-buttons button{font-size:12px}.export-note{font-size:10px;color:#81969c}.export-result{border-top:1px solid #e7eeee;padding:13px 15px;background:#f4faf7;font-size:12px;line-height:1.7}.export-result a{font-weight:600}.export-result .muted{font-size:11px}.file-list{display:flex;gap:6px;flex-wrap:wrap;margin-top:7px}.file-chip{font-size:10px;background:#fff;border:1px solid #d6e5df;border-radius:4px;padding:2px 6px}
+.table-wrap{overflow:auto}.parcel-table{border-collapse:collapse;width:100%;font-size:11px}.parcel-table th{font-weight:500;text-align:left;color:#809098;background:#f8fafb;padding:9px 11px;border-bottom:1px solid var(--line);white-space:nowrap}.parcel-table td{padding:11px;border-bottom:1px solid #edf2f3;vertical-align:top;white-space:nowrap;font-variant-numeric:tabular-nums}.parcel-table tr[data-id]{cursor:pointer}.parcel-table tr[data-id]:hover{background:#f1f8f5}.parcel-table tr.selected{background:#eaf5f0}.parcel-table td:last-child{text-align:right}.parcel-table .sub{display:block;font-size:9px;color:#84979f;margin-top:2px}.table-foot{padding:10px 14px;font-size:10px;color:#81939b;line-height:1.6}.area-balance{padding:13px 15px;font-size:11px}.balance-line{display:flex;justify-content:space-between;gap:10px;padding:4px 0;color:#657c88;font-variant-numeric:tabular-nums}.balance-line strong{color:#355460;font-weight:550}.balance-total{margin-top:6px;padding-top:9px;border-top:1px solid #e5ecee}.check-group{border-top:1px solid #edf1f2}.check-group:first-child{border-top:0}.check-title{display:flex;align-items:center;justify-content:space-between;padding:11px 15px;font-size:11px;font-weight:600}.check-list{padding:0 15px 12px;display:flex;flex-direction:column;gap:9px;max-height:270px;overflow:auto}.check-item{font-size:11px;line-height:1.65;color:#6d828b;border-left:2px solid #b7d5ca;padding-left:9px}.check-item.warning{border-color:#d3b883}.check-item.error{border-color:#c97272;color:#a54a4a}.check-detail{font-size:10px;color:#83969e;word-break:break-word;margin-top:3px}.empty-line{font-size:11px;color:#96a5ab}.report-heading{padding:13px 15px;display:flex;align-items:center;justify-content:space-between}.report-heading h2{font-size:14px}
+details.param-details{border:1px solid var(--line);border-radius:9px;background:white;overflow:hidden}details.param-details summary{cursor:pointer;padding:13px 16px;font-size:12px;color:#607984;list-style:none;display:flex;justify-content:space-between;align-items:center}details.param-details summary::after{content:'＋';font-size:16px;color:#81979d}details[open].param-details summary::after{content:'−'}details.param-details .detail-body{padding:0 15px 15px}textarea#jsonEditor{font:11px/1.65 Consolas,"Microsoft YaHei",monospace;resize:vertical;min-height:275px;tab-size:2;background:#fcfdfd}.json-tools{display:flex;justify-content:space-between;gap:7px;align-items:center;margin-top:9px}.json-tools button{font-size:11px}.json-note{font-size:10px;color:#8b9ba2;line-height:1.7;margin-bottom:9px}.footnote{padding:14px 3px 0;color:#83949b;font-size:10px;display:flex;justify-content:space-between;gap:15px;line-height:1.7}
+@media(min-width:1700px){.workspace{grid-template-columns:302px minmax(500px,1fr) 370px}.canvas-wrap{min-height:555px}.drawing-inner{min-height:550px}.panel-body{padding:17px 18px}.parcel-table{font-size:12px}}
+@media(max-width:1250px){.workspace{grid-template-columns:250px minmax(320px,1fr)}.right-column{grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr}.right-column .panel:first-child{grid-row:auto}.metric-strip{gap:7px}.metric{padding:11px 10px}.metric-value{font-size:20px}.scope{display:none}.canvas-wrap{min-height:445px}.drawing-inner{min-height:440px}.check-list{max-height:210px}}
+@media(max-width:760px){header{padding:15px;align-items:flex-start}.brand-mark{width:31px;height:31px;padding:5px}.brand{gap:8px}h1{font-size:17px}.brand-copy .muted{font-size:9px}.header-tools{gap:5px;justify-content:flex-end}.header-tools .tag{display:none}.header-tools button{font-size:11px;padding:6px 8px}.subbar{padding:10px 15px}.steps{gap:8px;font-size:10px}.steps em{display:none}.steps b{width:18px;height:18px;line-height:16px;font-size:10px}.steps span{gap:5px}main{padding:14px 12px}.intro{align-items:flex-start;flex-direction:column;gap:7px}.intro h2{font-size:16px}.workspace{display:flex;flex-direction:column}.column{width:100%}.left-column{display:grid;grid-template-columns:1fr 1fr;align-items:start}.left-column>.param-details{grid-column:1/-1}.right-column{display:flex}.left-column>.panel{height:100%}.panel-head{padding:11px 12px}.panel-body{padding:12px}.field-grid{grid-template-columns:1fr;gap:8px}.field-grid .field:nth-child(n+3){display:block}.road-row{grid-template-columns:minmax(0,1fr) 66px;gap:4px}.road-name{font-size:10px}.road-id{font-size:9px}.metric-strip{grid-template-columns:repeat(4,minmax(0,1fr))}.metric{padding:9px 8px}.metric-label{font-size:9px}.metric-value{font-size:18px}.metric-unit{font-size:9px;margin-left:1px}.metric-foot{display:none}.preview-head{padding:10px}.tabs button{padding:6px 8px;font-size:11px}.canvas-wrap{min-height:360px;max-height:72vh}.drawing-inner{padding:22px 10px 10px;min-height:350px}.exportbar{padding:11px}.export-buttons{width:100%}.export-buttons button{flex:1;font-size:11px;padding:8px}.preview-caption{font-size:10px}.legend{gap:9px;font-size:9px;padding:9px 11px}.footnote{flex-direction:column;gap:3px}.json-tools{flex-wrap:wrap}.panel-head h2{font-size:13px}}
+@media(max-width:420px){.left-column{display:flex}.field-grid{grid-template-columns:1fr 1fr}.field-grid .field:nth-child(n+3){display:block}.metric-strip{grid-template-columns:1fr 1fr}.header-tools button{font-size:10px}.steps{flex-wrap:wrap}.export-buttons{flex-direction:column}}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand"><div class="brand-mark" aria-hidden="true"><i></i><i></i><i></i><i></i></div><div class="brand-copy"><h1>规绘 <span style="font-weight:400;color:#a5b5bb">｜</span> 地块与图则</h1><div class="muted">PLANNING STUDIO · REGULATORY DESIGN</div></div></div>
+  <div class="header-tools"><span class="tag teal" id="sourceTag">教学合成案例</span><button id="resetBtn" class="quiet">载入教学案例</button><a href="/" class="small-text" style="margin-left:5px">返回工作台 ↗</a></div>
+</header>
+<div class="subbar"><div class="steps"><span><b>1</b>定义道路</span><em>→</em><span><b>2</b>生成地块</span><em>→</em><span><b>3</b>配置指标</span><em>→</em><span><b>4</b>校核与出图</span></div><div class="scope">每一次修改，保留明确的参数与计算结果</div></div>
+<main>
+  <div class="intro"><div><h2>从道路用地，到可核对的地块成果</h2><p id="siteSubtitle">240 × 180 m 教学场地 · 西南部孔洞排除计算 · 非大钟寺实测场地</p></div><div class="statusbar" role="status" aria-live="polite"><span class="dot" id="statusDot"></span><span id="statusText">正在载入案例…</span></div></div>
+  <div id="notice" class="notice hidden" role="alert"></div>
+  <div class="workspace">
+    <aside class="column left-column">
+      <section class="panel"><div class="panel-head"><h2>道路与场地</h2><span class="tag" id="modeTag">道路分割</span></div><div class="panel-body"><div class="section-label">道路计算总宽</div><div id="roadInputs"><p class="panel-note">正在读取道路…</p></div><p class="form-note">修改宽度后重算地块。这里的计算走廊未包含交叉口工程设计。</p><button id="recomputeBtn" class="primary wide">重新生成与校核</button><div class="divider"></div><div class="balance-line"><span>坐标单位</span><strong id="unitsText">米 · 局部平面</strong></div><div class="balance-line"><span>边界孔洞</span><strong id="holesText">—</strong></div><p class="panel-note" style="margin-top:8px" id="boundaryNote">孔洞作为本次计算排除空间。</p></div></section>
+      <section class="panel"><div class="panel-head"><h2>选中地块</h2><span id="selectedPill" class="selected-pill">待生成</span></div><div class="panel-body"><div class="field"><label for="parcelSelect">在图中点选，或选择编号</label><select id="parcelSelect" disabled><option>待生成地块</option></select></div><div class="field"><label for="landUseCode">用地代码</label><input id="landUseCode" data-attr="land_use_code" placeholder="留空表示待输入" maxlength="80" disabled></div><div class="field"><label for="landUseName">用地名称</label><input id="landUseName" data-attr="land_use_name" placeholder="留空表示待输入" maxlength="80" disabled></div><div class="field-grid"><div class="field"><label for="farMax">容积率上限</label><input id="farMax" data-attr="far_max" type="number" min="0" step="any" placeholder="待输入" disabled></div><div class="field"><label for="heightMax">高度上限 / m</label><input id="heightMax" data-attr="height_max_m" type="number" min="0" step="any" placeholder="待输入" disabled></div><div class="field"><label for="coverageMax">建筑密度上限 / %</label><input id="coverageMax" data-attr="coverage_max_pct" type="number" min="0" max="100" step="any" placeholder="待输入" disabled></div><div class="field"><label for="greenMin">绿地率下限 / %</label><input id="greenMin" data-attr="green_min_pct" type="number" min="0" max="100" step="any" placeholder="待输入" disabled></div></div><p class="form-note">数值由使用者设定；空白保持未知，不补入规范默认值。</p><button id="applyParcelBtn" class="wide" disabled>应用指标并重算</button></div></section>
+      <details class="param-details"><summary>完整参数 <span class="tag" id="jsonState">JSON</span></summary><div class="detail-body"><p class="json-note">编辑边界、道路与地块数据。此处只接收参数，不执行代码。重新生成时应用编辑内容。</p><label class="hidden" for="jsonEditor">完整 JSON 参数</label><textarea id="jsonEditor" spellcheck="false" aria-label="完整 JSON 参数"></textarea><div class="json-tools"><button id="formatJsonBtn" class="small">整理格式</button><button id="saveJsonBtn" class="small">保存参数 JSON</button></div></div></details>
+    </aside>
+    <div class="column center-column">
+      <div class="metric-strip"><div class="metric"><div class="metric-label">有效边界面积</div><div class="metric-value" id="metricBoundary">—</div><div class="metric-foot">扣除边界孔洞</div></div><div class="metric"><div class="metric-label">道路并集面积</div><div class="metric-value" id="metricRoad">—</div><div class="metric-foot">交叉部分不重复</div></div><div class="metric"><div class="metric-label">净地块面积</div><div class="metric-value" id="metricParcel">—</div><div class="metric-foot">独立地块合计</div></div><div class="metric"><div class="metric-label">地块数量</div><div class="metric-value" id="metricCount">—</div><div class="metric-foot">小地块保持可见</div></div></div>
+      <section class="panel"><div class="preview-head"><div class="tabs" role="tablist" aria-label="预览模式"><button id="mapTab" class="active" role="tab" aria-selected="true">地块总图</button><button id="sheetTab" role="tab" aria-selected="false" disabled>选中地块图则</button></div><div class="zoom-controls"><button id="zoomOutBtn" class="small" aria-label="缩小">−</button><span class="zoom-label" id="zoomLabel">100%</span><button id="zoomInBtn" class="small" aria-label="放大">＋</button><button id="fitBtn" class="small">适配</button></div></div><div class="canvas-wrap" id="canvasWrap"><div id="staleOverlay" class="stale-overlay hidden">参数已修改 · 当前预览待更新</div><div id="north" class="north"><b>↑</b> +Y</div><div class="drawing-inner" id="drawing"><div class="map-empty"><strong>先建立一份可核对的地块总图</strong><span>正在载入教学案例与指标…</span></div></div></div><div class="legend" id="legend"><span><i class="swatch"></i>地块</span><span><i class="swatch road"></i>道路计算走廊</span><span><i class="swatch hole"></i>排除空间</span><span><i class="swatch selected"></i>选中地块</span><span style="margin-left:auto">单位 m · 屏幕自适应显示</span></div><div class="preview-caption" id="previewCaption">点击地块查看与编辑指标。图形按原始坐标比例显示，屏幕尺寸不代表打印比例。</div><div class="exportbar"><div class="export-buttons"><button id="exportBtn" class="primary" disabled>导出 DXF + CSV + 图则包</button><button id="cadBtn" class="dark" disabled>CAD 新图落图并保存</button></div><div class="export-note">在独立新图生成成果</div></div><div id="exportResult" class="export-result hidden"></div></section>
+      <details class="param-details"><summary>计算口径与数据来源</summary><div class="detail-body"><p id="sourceNotes" class="panel-note">正在载入…</p><p class="panel-note" style="margin-top:9px">条件计容面积上限 = 净地块面积 × 使用者输入的容积率上限。这是条件计算，不是实际建筑面积；未完成规划审查。</p></div></details>
+    </div>
+    <aside class="column right-column">
+      <section class="panel"><div class="panel-head"><h2>地块指标汇总</h2><span class="tag" id="parcelCountTag">—</span></div><div class="table-wrap"><table class="parcel-table"><thead><tr><th>地块 / 用途</th><th>净面积 m²</th><th>容积率上限</th></tr></thead><tbody id="parcelTable"><tr><td colspan="3" class="muted">等待生成结果</td></tr></tbody></table></div><div class="table-foot">“—”表示未输入。点击任一行，编辑该地块指标并查看图则。</div><div class="area-balance"><div class="section-label" style="margin-bottom:6px">面积平衡 · m²</div><div class="balance-line"><span>有效边界</span><strong id="balanceBoundary">—</strong></div><div class="balance-line"><span>道路并集</span><strong id="balanceRoad">—</strong></div><div class="balance-line"><span>地块合计</span><strong id="balanceParcel">—</strong></div><div class="balance-line"><span>未分配空间</span><strong id="balanceUnallocated">—</strong></div><div class="balance-line balance-total"><span>平衡残差</span><strong id="balanceResidual">—</strong></div></div></section>
+      <section class="panel"><div class="report-heading"><h2>数值校核与待办</h2><span class="tag" id="reportTag">未生成</span></div><div id="reportBody"><div class="panel-body"><p class="empty-line">重新生成后显示几何与指标检查。</p></div></div></section>
+    </aside>
+  </div>
+  <div class="footnote"><span>规绘 · 地块与图则工作页　/　参数、几何、表格与图则保持同一版本</span><span id="footerScope">教学合成数据；不代替场地调查与规划判断。</span></div>
+</main>
+<script>
+'use strict';
+(() => {
+  const $ = id => document.getElementById(id);
+  const sessionToken = new URLSearchParams(location.hash.slice(1)).get('token') || '';
+  if (location.hash) history.replaceState(null, '', location.pathname + location.search);
+  const state = { spec:null, result:null, sheet:null, selected:null, dirty:true, jsonDirty:false, attributeDirty:false, roadDirty:false, busy:false, view:'map', zoom:1, revision:0, invalidEditor:false, bindingCandidate:null };
+  const bindingPanel=document.createElement('div');bindingPanel.className='notice hidden';bindingPanel.id='bindingPanel';
+  bindingPanel.innerHTML='<div style="margin-bottom:8px"><strong>地块几何已改变，原指标归属需要复核。</strong> 下图是新几何的审阅预览，旧绑定仍保留。请逐块核对编号、位置与指标；确认后才能导出。</div><button id="confirmBindingBtn" class="small">按当前几何重新确认指标归属</button>';
+  document.querySelector('.center-column').insertBefore(bindingPanel,document.querySelector('.center-column .panel'));
+  const fields = ['land_use_code','land_use_name','far_max','coverage_max_pct','green_min_pct','height_max_m'];
+  const palette = ['#dcebe5','#e0eaf0','#e8e9dc','#e5e5ef','#e1ecdf','#ede6dd'];
+  const fmt = (v,d=2) => typeof v === 'number' && Number.isFinite(v) ? v.toLocaleString('zh-CN',{minimumFractionDigits:d,maximumFractionDigits:d}) : '—';
+  const esc = v => String(v ?? '').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const metricUnit = (v,u,d=2) => `${fmt(v,d)}<span class="metric-unit">${esc(u)}</span>`;
+  function showNotice(message,error=false) { $('notice').textContent=message; $('notice').className='notice'+(error?' error':'')+(message?'':' hidden'); }
+  function status(message,busy=false) { $('statusText').textContent=message; $('statusDot').className='dot'+(busy?' busy':''); }
+  async function api(path, options={}) {
+    const headers = new Headers(options.headers || {}); headers.set('X-Local-Token',sessionToken);
+    if (options.body !== undefined) headers.set('Content-Type','application/json');
+    const response = await fetch(path,{...options,headers,credentials:'same-origin'});
+    let body; try { body=await response.json(); } catch (_) { throw new Error('返回内容无法读取，请重试。'); }
+    if (!response.ok) {
+      const detail = body.detail || body.message || `请求未完成（${response.status}）`;
+      throw new Error(typeof detail==='string'?detail:JSON.stringify(detail));
+    }
+    return body;
+  }
+  function setBusy(value, message='正在计算…') {
+    state.busy=value;
+    for (const el of document.querySelectorAll('input,textarea,select,button')) el.disabled=value;
+    if (!value) { syncButtons(); if (!state.selected) for(const el of document.querySelectorAll('[data-attr]')) el.disabled=true; }
+    status(message,value);
+  }
+  function validResult() { return !!state.result && !(state.result.report?.errors?.length); }
+  function syncButtons() {
+    const ready=validResult()&&!state.dirty&&!state.busy;
+    $('exportBtn').disabled=!ready; $('cadBtn').disabled=!ready;
+    $('sheetTab').disabled=!ready||!state.selected;
+    $('applyParcelBtn').disabled=state.busy||!state.selected;
+    $('parcelSelect').disabled=state.busy||!state.result?.parcels?.length;
+    $('recomputeBtn').disabled=state.busy||!state.spec;
+    $('saveJsonBtn').disabled=state.busy||!state.spec;
+    $('formatJsonBtn').disabled=state.busy||!state.spec;
+    $('bindingPanel').classList.toggle('hidden',!state.bindingCandidate);
+    $('confirmBindingBtn').disabled=state.busy||!state.bindingCandidate||state.dirty;
+    $('staleOverlay').classList.toggle('hidden',!state.dirty||!state.result);
+    $('jsonState').textContent=state.dirty?'待重算':'已同步';
+    $('jsonState').className='tag'+(state.dirty?' warn':' teal');
+  }
+  function markDirty(message='参数已修改，请重新生成') {
+    state.dirty=true; state.revision++; state.sheet=null; state.bindingCandidate=null;
+    $('exportResult').classList.add('hidden'); syncButtons(); if(!state.busy) status(message);
+  }
+  function syncJSON() { $('jsonEditor').value=JSON.stringify(state.spec,null,2); state.jsonDirty=false; }
+  function readJSON() {
+    const spec=JSON.parse($('jsonEditor').value);
+    if (!spec || typeof spec!=='object' || Array.isArray(spec)) throw new Error('完整参数必须为 JSON 对象。');
+    return spec;
+  }
+  function takeDraft() { if(state.jsonDirty){state.spec=readJSON();state.jsonDirty=false;} }
+  function updateSource() {
+    const s=state.spec || {}; const synthetic=s.synthetic===true;
+    $('sourceTag').textContent=synthetic?'教学合成案例':'使用者提供参数';
+    $('siteSubtitle').textContent=synthetic?'教学合成场地 · 以参数边界为准 · 非大钟寺实测场地':'使用者提供的边界与参数 · 坐标与规划依据须核实';
+    $('modeTag').textContent=s.mode==='explicit'?'显式地块':'道路分割';
+    $('unitsText').textContent=s.units==='m'&&s.coordinate_reference==='local_cartesian'?'米 · 局部平面':`${s.units || '单位待输入'} · ${s.coordinate_reference || '坐标基准待输入'}`;
+    const holes=Array.isArray(s.boundary?.holes)?s.boundary.holes.length:0;
+    $('holesText').textContent=`${holes} 处排除空间`;
+    $('sourceNotes').textContent=s.notes || s.source || '未提供来源说明；请在完整参数中补充。';
+    $('footerScope').textContent=synthetic?'教学合成数据；不代替场地调查与规划判断。':'使用者提供参数；计算结果未完成规划审查。';
+  }
+  function buildRoadInputs() {
+    const host=$('roadInputs');host.replaceChildren();
+    const roads=Array.isArray(state.spec?.roads)?state.spec.roads:[];
+    if(!roads.length){host.innerHTML='<p class="panel-note">当前参数没有道路。可在完整参数中定义道路，或使用显式地块。</p>';return;}
+    roads.forEach((r,index)=>{
+      const row=document.createElement('div');row.className='road-row';
+      row.innerHTML=`<div><div class="road-name" title="${esc(r.name||r.id)}">${esc(r.name||r.id||'未命名道路')}</div><div class="road-id">${esc(r.id)}</div></div><div class="unit-input"><input type="number" min="0.01" step="any" aria-label="${esc(r.name||r.id)} 总宽" value="${esc(r.total_width_m ?? '')}"><span>m</span></div>`;
+      const input=row.querySelector('input');input.dataset.roadId=r.id;
+      input.addEventListener('input',()=>{state.roadDirty=true;markDirty('道路宽度已修改，结束输入后将重新生成');});
+      input.addEventListener('change',async()=>{
+        try{takeDraft();const v=input.value===''?null:Number(input.value);if(!Number.isFinite(v)||v<=0)throw new Error('道路总宽应为大于零的数值。');
+          const target=state.spec.roads?.find(x=>x.id===r.id);if(!target)throw new Error('道路参数已改变，请重新生成后再编辑。');
+          target.total_width_m=v;input.removeAttribute('aria-invalid');syncJSON();await recompute();
+        }catch(err){input.setAttribute('aria-invalid','true');showNotice(err.message,true);}
+      });host.append(row);
+    });
+  }
+  function captureRoadInputs() {
+    takeDraft();
+    for(const input of document.querySelectorAll('[data-road-id]')){
+      const value=input.value.trim()===''?null:Number(input.value);
+      if(value===null||!Number.isFinite(value)||value<=0){input.setAttribute('aria-invalid','true');throw new Error('道路总宽应为大于零的数值。');}
+      const target=state.spec.roads?.find(r=>r.id===input.dataset.roadId);
+      if(!target)throw new Error('道路清单已改变，请先应用完整参数，再编辑总宽。');
+      target.total_width_m=value;input.removeAttribute('aria-invalid');
+    }
+    state.roadDirty=false;syncJSON();
+  }
+  function attributesFromSpec(pid) {
+    if(state.spec?.mode==='explicit')return state.spec.parcels?.find(p=>p.id===pid)?.attributes || {};
+    return state.spec?.parcel_attributes?.[pid] || {};
+  }
+  function renderEditor() {
+    const parcels=state.result?.parcels || [];
+    $('parcelSelect').replaceChildren();
+    if(!parcels.length){const op=document.createElement('option');op.textContent='待生成地块';$('parcelSelect').append(op);}
+    for(const p of parcels){const op=document.createElement('option');op.value=p.id;op.textContent=`${p.id} · ${fmt(p.data?.area_m2)} m²`;$('parcelSelect').append(op);}
+    if(state.selected)$('parcelSelect').value=state.selected;
+    $('selectedPill').textContent=state.selected || '待生成';
+    const attrs=attributesFromSpec(state.selected);state.attributeDirty=false;
+    for(const el of document.querySelectorAll('[data-attr]')){el.value=attrs[el.dataset.attr] ?? '';el.disabled=!state.selected||state.busy;el.removeAttribute('aria-invalid');}
+    syncButtons();
+  }
+  async function selectParcel(pid) {
+    if(state.busy)return;
+    if(state.dirty){showNotice('参数尚未重算，请先完成当前修改，再切换地块。');return;}
+    state.selected=pid;renderEditor();renderTable();
+    if(state.view==='sheet')await showSheet();else renderDrawing();
+  }
+  async function applyAttributes() {
+    if(!state.selected)return;
+    try{
+      captureAttributeInputs();markDirty();await recompute();
+    }catch(err){showNotice(err.message,true);}
+  }
+  function captureAttributeInputs() {
+      takeDraft();const attrs={};
+      for(const el of document.querySelectorAll('[data-attr]')){
+        const key=el.dataset.attr;const text=el.value.trim();let value=text===''?null:fields.indexOf(key)<2?text:Number(text);
+        if(typeof value==='number'&&(!Number.isFinite(value)||value<0||(key.endsWith('_pct')&&value>100))){el.setAttribute('aria-invalid','true');throw new Error('请检查指标数值：不得小于零，百分比不得超过 100。');}
+        attrs[key]=value;el.removeAttribute('aria-invalid');
+      }
+      if(state.spec.mode==='explicit'){
+        const parcel=state.spec.parcels?.find(p=>p.id===state.selected);if(!parcel)throw new Error('当前地块不存在，请先重新生成。');parcel.attributes=attrs;
+      } else {if(!state.spec.parcel_attributes)state.spec.parcel_attributes={};state.spec.parcel_attributes[state.selected]=attrs;}
+      syncJSON();state.attributeDirty=false;
+  }
+  function renderMetrics() {
+    const m=state.result?.metrics || {};
+    $('metricBoundary').innerHTML=metricUnit(m.boundary_area_m2==null?null:m.boundary_area_m2/10000,'ha');
+    $('metricRoad').innerHTML=metricUnit(m.road_area_m2==null?null:m.road_area_m2/10000,'ha');
+    $('metricParcel').innerHTML=metricUnit(m.parcel_area_m2==null?null:m.parcel_area_m2/10000,'ha');
+    $('metricCount').innerHTML=metricUnit(m.parcel_count,'块',0);
+    for(const [id,key]of Object.entries({balanceBoundary:'boundary_area_m2',balanceRoad:'road_area_m2',balanceParcel:'parcel_area_m2',balanceUnallocated:'unallocated_area_m2'}))$(id).textContent=fmt(m[key]);
+    $('balanceResidual').textContent=fmt(m.area_conservation_residual_m2,6);
+    $('balanceResidual').title=m.area_tolerance_m2==null?'':`容差 ${m.area_tolerance_m2} m²`;
+    $('boundaryNote').textContent=m.boundary_holes_area_m2>0?`孔洞合计 ${fmt(m.boundary_holes_area_m2)} m²，不计入有效边界和面积占比分母。`:'面积平衡以有效边界为分母；地块未覆盖部分单独计量。';
+  }
+  function renderTable() {
+    const rows=state.result?.metrics?.rows || [];
+    $('parcelCountTag').textContent=`${rows.length} 块`;
+    const tbody=$('parcelTable');tbody.replaceChildren();
+    if(!rows.length){tbody.innerHTML='<tr><td colspan="3" class="muted">暂无可用地块结果</td></tr>';return;}
+    for(const r of rows){const tr=document.createElement('tr');tr.dataset.id=r.parcel_id;tr.tabIndex=0;tr.classList.toggle('selected',r.parcel_id===state.selected);tr.setAttribute('aria-label',`选择地块 ${r.parcel_id}`);tr.innerHTML=`<td><strong>${esc(r.parcel_id)}</strong><span class="sub" title="${esc(r.land_use_name||'用途待输入')}">${esc(r.land_use_code||'用途待输入')}</span></td><td>${fmt(r.area_m2)}</td><td>${fmt(r.far_max)}</td>`;tr.addEventListener('click',()=>selectParcel(r.parcel_id));tr.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();selectParcel(r.parcel_id);}});tbody.append(tr);}
+  }
+  function renderReport() {
+    const report=state.result?.report || {};const errors=report.errors||[],warnings=report.warnings||[],checks=report.checks||[];
+    $('reportTag').textContent=errors.length?`${errors.length} 项待修正`:'几何计算可用';$('reportTag').className='tag '+(errors.length?'error':'teal');
+    const host=$('reportBody');host.replaceChildren();
+    const contextNames={parcel_id:'地块',road_id:'道路',other_parcel_id:'相邻地块',overlap_area_m2:'重叠面积 m²',area_m2:'面积 m²',residual_m2:'残差 m²',tolerance_m2:'容差 m²',threshold_m2:'提示阈值 m²',excluded_area_m2:'排除面积 m²'};
+    for(const [title,items,kind]of [['需要修正',errors,'error'],['待核实与适用范围',warnings,'warning'],['数值校核',checks,'check']]){
+      const group=document.createElement('div');group.className='check-group';const header=document.createElement('div');header.className='check-title';header.innerHTML=`<span>${title}</span><span class="muted">${items.length}</span>`;group.append(header);
+      const list=document.createElement('div');list.className='check-list';
+      if(!items.length)list.innerHTML='<p class="empty-line">无</p>';
+      for(const item of items){const row=document.createElement('div');row.className='check-item '+kind;const msg=document.createElement('div');msg.textContent=item.message || String(item);row.append(msg);const context=Object.entries(contextNames).filter(([key])=>item[key]!=null).map(([key,label])=>`${label}：${typeof item[key]==='number'?fmt(item[key],6):item[key]}`);if(Array.isArray(item.parcels))context.push('涉及地块：'+item.parcels.map(x=>typeof x==='string'?x:x.parcel_id).join('、'));if(Array.isArray(item.parcel_ids))context.push('地块：'+item.parcel_ids.join('、'));if(context.length){const sub=document.createElement('div');sub.className='check-detail';sub.textContent=context.join('；');row.append(sub);}list.append(row);}
+      group.append(list);host.append(group);
+    }
+  }
+  function svgEl(type,attrs={}) {const el=document.createElementNS('http://www.w3.org/2000/svg',type);for(const[k,v]of Object.entries(attrs))el.setAttribute(k,String(v));return el;}
+  function polygonPath(poly) {return [poly.outer,...(poly.holes||[])].filter(r=>Array.isArray(r)&&r.length).map(r=>'M'+r.map(p=>`${p[0]},${-p[1]}`).join('L')+'Z').join(' ');}
+  function renderDrawing() {
+    const result=state.view==='sheet'?state.sheet:state.result;const host=$('drawing');host.replaceChildren();
+    $('mapTab').classList.toggle('active',state.view==='map');$('mapTab').setAttribute('aria-selected',state.view==='map');$('sheetTab').classList.toggle('active',state.view==='sheet');$('sheetTab').setAttribute('aria-selected',state.view==='sheet');$('north').classList.toggle('hidden',state.view==='sheet');$('legend').classList.toggle('hidden',state.view==='sheet');
+    if(!result||!result.entities?.length){host.innerHTML='<div class="map-empty"><strong>暂时没有可显示的图形</strong><span>请检查参数与右侧校核提示，再重新生成。</span></div>';return;}
+    const b=result.bounds || [0,0,1,1];const w=Math.max(1e-9,b[2]-b[0]),h=Math.max(1e-9,b[3]-b[1]);const pad=Math.max(w,h)*(state.view==='sheet'?.025:.055);
+    const svg=svgEl('svg',{viewBox:`${b[0]-pad} ${-b[3]-pad} ${w+2*pad} ${h+2*pad}`,role:'img','aria-label':state.view==='sheet'?`${state.selected} 地块图则`:'道路计算走廊与地块总图','preserveAspectRatio':'xMidYMid meet'});
+    svg.style.width=(state.zoom*100)+'%';svg.style.minWidth=(state.zoom*100)+'%';svg.style.maxHeight=state.zoom>1?'none':'650px';
+    if(state.view==='map'){
+      const boundary=Array.isArray(state.spec.boundary)?{outer:state.spec.boundary,holes:[]}:state.spec.boundary;
+      if(boundary?.outer)svg.append(svgEl('path',{d:polygonPath(boundary),fill:'#eff3f3','fill-rule':'evenodd',stroke:'none'}));
+      for(const poly of result.unallocated_polygons||[])svg.append(svgEl('path',{d:polygonPath(poly),fill:'#f3ede0','fill-rule':'evenodd'}));
+      for(const poly of result.road_polygons||[])svg.append(svgEl('path',{d:polygonPath(poly),fill:'#e1e7ea','fill-rule':'evenodd'}));
+      (result.parcels||[]).forEach((p,index)=>{const path=svgEl('path',{d:polygonPath(p.polygon),fill:p.id===state.selected?'#b7dacc':palette[index%palette.length],'fill-rule':'evenodd',stroke:p.id===state.selected?'#18786e':'#7eaaa0','stroke-width':p.id===state.selected?2.1:.8,'vector-effect':'non-scaling-stroke',class:'parcel-shape',tabindex:0,role:'button','aria-label':`选择地块 ${p.id}`});path.addEventListener('click',()=>selectParcel(p.id));path.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();selectParcel(p.id);}});const title=svgEl('title');title.textContent=`${p.id} · ${fmt(p.data?.area_m2)} m²`;path.append(title);svg.append(path);});
+    }
+    for(const e of result.entities||[]){
+      if(state.view==='map'&&['PARCEL_BOUNDARY','PARCEL_HOLE','PARCEL_ROAD'].includes(e.layer))continue;
+      const color=e.layer==='PARCEL_ROAD_CENTER'?'#8a9fa9':e.layer==='SITE_EXCLUSION'?'#a5b6ba':e.layer==='PARCEL_BOUNDARY'?'#267d6e':e.layer==='PARCEL_HOLE'?'#9a8f64':e.layer==='PARCEL_LABEL'?'#436859':'#52717e';
+      let el=null;
+      if(e.type==='polyline'&&Array.isArray(e.points))el=svgEl(e.closed?'polygon':'polyline',{points:e.points.map(p=>`${p[0]},${-p[1]}`).join(' '),fill:'none',stroke:color,'stroke-width':e.layer==='SITE_BOUNDARY'?1.3:.75,'vector-effect':'non-scaling-stroke'});
+      else if(e.type==='line'&&e.start&&e.end)el=svgEl('line',{x1:e.start[0],y1:-e.start[1],x2:e.end[0],y2:-e.end[1],stroke:color,'stroke-width':.75,'vector-effect':'non-scaling-stroke'});
+      else if(e.type==='text'&&e.position){
+        if(state.view==='map'&&e.layer==='PARCEL_LABEL'){
+          const parcel=(result.parcels||[]).find(p=>p.id===e.parcel_id);const envelope=e.label_envelope;
+          const x=envelope?(envelope[0]+envelope[2])/2:e.position[0];const y=envelope?(envelope[1]+envelope[3])/2:e.position[1];
+          const screenWidth=Math.max(240,host.clientWidth-40)*state.zoom;const readableHeight=(w+2*pad)/screenWidth*12;
+          el=svgEl('text',{x,y:-y,fill:color,'font-size':Math.max(e.height||0,readableHeight),'font-weight':600,'text-anchor':'middle'});
+          const name=svgEl('tspan',{x,dy:'-.18em'});name.textContent=e.parcel_id || '';el.append(name);
+          const area=svgEl('tspan',{x,dy:'1.4em','font-size':'.86em','font-weight':400});area.textContent=parcel?`${fmt(parcel.data?.area_m2,0)} m²`:e.text || '';el.append(area);
+        }else{el=svgEl('text',{x:e.position[0],y:-e.position[1],fill:color,'font-size':e.height || h/70,'font-weight':400});el.textContent=e.text || '';}
+      }
+      if(el){if(e.layer==='PARCEL_ROAD_CENTER'||e.layer==='SITE_EXCLUSION')el.setAttribute('stroke-dasharray','5 4');if(e.type==='text')el.style.pointerEvents='none';svg.append(el);}
+    }
+    host.append(svg);
+    $('previewCaption').textContent=state.view==='sheet'?`A3 横向教学图则 · 图框 420 × 297 mm · 图内示意比例 1:${result.metrics?.map_scale_denominator ?? '—'}。图则几何已缩放，原始地块坐标保存在参数中。`:'点击地块查看与编辑指标。道路为用地计算走廊；屏幕按坐标比例自适应显示，不代表打印比例。';
+  }
+  async function recompute() {
+    if(state.busy)return;
+    try{
+      if(state.attributeDirty)captureAttributeInputs();else takeDraft();if(state.roadDirty)captureRoadInputs();showNotice('');setBusy(true,'正在生成地块并校核面积…');
+      state.bindingCandidate=null;
+      let result=await api('/api/regulatory/preview',{method:'POST',body:JSON.stringify({spec:state.spec})});
+      const bindingErrors=(result.report?.errors||[]).filter(x=>x.code==='attribute_binding_mismatch');
+      if(bindingErrors.length){
+        const candidate=JSON.parse(JSON.stringify(state.spec));delete candidate.attribute_geometry_bindings;
+        const candidateResult=await api('/api/regulatory/preview',{method:'POST',body:JSON.stringify({spec:candidate})});
+        if(!candidateResult.report?.errors?.length&&candidateResult.geometry_bindings){
+          state.bindingCandidate={spec:candidate,bindings:candidateResult.geometry_bindings};
+          result={...candidateResult,report:{...candidateResult.report,errors:bindingErrors}};
+        }
+      }else if(!result.report?.errors?.length&&!Object.prototype.hasOwnProperty.call(state.spec,'attribute_geometry_bindings')&&result.geometry_bindings){
+        const hasAssigned=Object.values(state.spec.parcel_attributes||{}).some(a=>Object.values(a||{}).some(v=>v!==null&&v!==undefined)) || (state.spec.parcels||[]).some(p=>Object.values(p.attributes||{}).some(v=>v!==null&&v!==undefined));
+        if(hasAssigned){state.spec.attribute_geometry_bindings=JSON.parse(JSON.stringify(result.geometry_bindings));result=await api('/api/regulatory/preview',{method:'POST',body:JSON.stringify({spec:state.spec})});}
+      }
+      state.result=result;state.sheet=null;state.view='map';state.dirty=false;state.invalidEditor=false;
+      if(!(result.parcels||[]).some(p=>p.id===state.selected))state.selected=result.parcels?.[0]?.id || null;
+      syncJSON();updateSource();buildRoadInputs();renderMetrics();renderTable();renderReport();renderEditor();renderDrawing();
+      const errors=result.report?.errors?.length || 0;
+      if(errors)showNotice(state.bindingCandidate?'道路或地块几何改变了。请核对新预览中各地块的指标归属，再使用确认按钮。':'当前参数存在几何或数据问题，请先修正右侧所列问题。',!state.bindingCandidate);
+      setBusy(false,errors?'生成未完成 · 请修正参数':'结果已更新 · 可审阅与导出');
+    }catch(err){markDirty();setBusy(false,'当前结果未更新');showNotice(err.message,true);}
+  }
+  async function showSheet() {
+    if(state.busy||state.dirty||!state.selected||!validResult())return;
+    try{showNotice('');setBusy(true,'正在生成选中地块的图则…');const sheet=await api('/api/regulatory/sheet-preview',{method:'POST',body:JSON.stringify({spec:state.spec,parcel_id:state.selected})});state.sheet=sheet;state.view='sheet';state.zoom=1;$('zoomLabel').textContent='100%';renderDrawing();setBusy(false,`${state.selected} 图则已生成`);}catch(err){setBusy(false,'图则暂未生成');showNotice(err.message,true);}
+  }
+  async function downloadURL(url,filename) {
+    const target=new URL(url,location.href);if(target.origin!==location.origin)throw new Error('下载地址不属于当前工作台。');
+    const response=await fetch(target.href,{headers:{'X-Local-Token':sessionToken},credentials:'same-origin'});
+    if(!response.ok)throw new Error('成果包下载未完成，请重试。');
+    saveBlob(await response.blob(),filename);
+  }
+  function saveBlob(blob,name){const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=name;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),20000);}
+  async function exportPackage(cadNew) {
+    if(state.busy||state.dirty||!validResult())return;
+    try{
+      showNotice('');setBusy(true,cadNew?'正在新建 CAD 图纸、落图并保存…':'正在生成 DXF、指标表与图则包…');
+      const data=await api('/api/regulatory/export',{method:'POST',body:JSON.stringify({spec:state.spec,cad_new:cadNew,confirm_cad_new:cadNew})});
+      const box=$('exportResult');box.replaceChildren();box.classList.remove('hidden');
+      const line=document.createElement('div');line.textContent=cadNew?'成果包已生成；CAD 执行结果见下方。':'成果包已生成。';box.append(line);
+      if(data.download_url){const a=document.createElement('a');a.href=data.download_url;a.textContent='下载本次成果 ZIP ↘';a.addEventListener('click',async e=>{e.preventDefault();try{await downloadURL(data.download_url,`规绘_地块图则_${data.artifact_id || '成果'}.zip`);}catch(err){showNotice(err.message,true);}});box.append(a);}
+      if(data.path){const path=document.createElement('div');path.className='muted';path.textContent='保存位置：'+data.path;path.style.overflowWrap='anywhere';box.append(path);}
+      if(data.cad){const c=document.createElement('div');c.className='muted';const readable=typeof data.cad==='string'?data.cad:data.cad.status==='saved'?'独立新图已保存。':data.cad.status==='failed_or_unknown'?`未确认落图完成：${data.cad.error || '请在 CAD 中检查当前图纸。'} 请核对后再操作，避免重复新建。`:data.cad.message || data.cad.saved_path || data.cad.path || data.cad.status || '已返回 CAD 操作记录，请核对图纸。';c.textContent='CAD：'+readable;box.append(c);}
+      if(Array.isArray(data.files)){const list=document.createElement('div');list.className='file-list';for(const f of data.files){const span=document.createElement('span');span.className='file-chip';span.textContent=typeof f==='string'?f.split(/[\\/]/).pop():f.name || f.filename || f.path?.split(/[\\/]/).pop() || '成果文件';list.append(span);}box.append(list);}
+      setBusy(false,'成果已生成 · 请下载或打开保存位置');
+    }catch(err){setBusy(false,'本次导出未完成');showNotice(err.message,true);}
+  }
+  async function loadExample(){if(state.busy)return;try{showNotice('');setBusy(true,'正在载入教学案例…');state.spec=await api('/api/regulatory/example');state.selected=null;state.result=null;state.sheet=null;state.view='map';state.dirty=true;state.attributeDirty=false;state.roadDirty=false;state.bindingCandidate=null;state.zoom=1;syncJSON();updateSource();buildRoadInputs();setBusy(false,'案例已载入');await recompute();}catch(err){setBusy(false,'案例未能载入');showNotice(err.message,true);}}
+  $('recomputeBtn').addEventListener('click',recompute);$('resetBtn').addEventListener('click',loadExample);
+  $('parcelSelect').addEventListener('change',e=>selectParcel(e.target.value));$('applyParcelBtn').addEventListener('click',applyAttributes);
+  for(const el of document.querySelectorAll('[data-attr]'))el.addEventListener('input',()=>{state.attributeDirty=true;markDirty('地块指标已修改，请应用指标并重算');});
+  $('confirmBindingBtn').addEventListener('click',async()=>{if(state.busy||state.dirty||!state.bindingCandidate)return;const candidate=state.bindingCandidate;state.spec=candidate.spec;state.spec.attribute_geometry_bindings=JSON.parse(JSON.stringify(candidate.bindings));syncJSON();markDirty();await recompute();if(validResult()&&!state.dirty)status('已按当前几何确认指标归属，结果已重新校核');});
+  $('jsonEditor').addEventListener('input',()=>{state.jsonDirty=true;markDirty('完整参数已修改，请重新生成');});
+  $('formatJsonBtn').addEventListener('click',()=>{try{const draft=readJSON();$('jsonEditor').value=JSON.stringify(draft,null,2);showNotice('');}catch(err){showNotice('JSON 格式有误：'+err.message,true);}});
+  $('saveJsonBtn').addEventListener('click',()=>{try{if(state.attributeDirty)captureAttributeInputs();if(state.roadDirty)captureRoadInputs();const draft=readJSON();saveBlob(new Blob([JSON.stringify(draft,null,2)],{type:'application/json;charset=utf-8'}),'规绘_地块参数.json');}catch(err){showNotice('参数有误：'+err.message,true);}});
+  $('mapTab').addEventListener('click',()=>{if(state.busy)return;state.view='map';renderDrawing();});$('sheetTab').addEventListener('click',showSheet);
+  $('exportBtn').addEventListener('click',()=>exportPackage(false));$('cadBtn').addEventListener('click',()=>exportPackage(true));
+  function zoom(v){state.zoom=Math.max(1,Math.min(3,v));$('zoomLabel').textContent=Math.round(state.zoom*100)+'%';renderDrawing();}
+  $('zoomInBtn').addEventListener('click',()=>zoom(state.zoom+.25));$('zoomOutBtn').addEventListener('click',()=>zoom(state.zoom-.25));$('fitBtn').addEventListener('click',()=>zoom(1));
+  let resizeTimer;window.addEventListener('resize',()=>{clearTimeout(resizeTimer);resizeTimer=setTimeout(()=>renderDrawing(),140);});
+  loadExample();
+})();
+</script>
+</body>
+</html>

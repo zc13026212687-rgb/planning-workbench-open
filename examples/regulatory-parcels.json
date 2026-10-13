@@ -1,0 +1,26 @@
+{
+  "schema_version": "1.0",
+  "kind": "regulatory_parcels",
+  "mode": "roads",
+  "units": "m",
+  "coordinate_reference": "local_cartesian",
+  "synthetic": true,
+  "source": "Original synthetic teaching fixture; no proprietary CAD assets or real-site claims",
+  "normative_status": "user_teaching_assumptions_not_compliance",
+  "notes": "240×180米原创矩形场地；西南部30×30米孔洞作为保留空间排除计算。保留说明不构成权属或用途确认。所有指标均为课堂假设，未引用规范限值；没有测绘或大钟寺实地依据。",
+  "boundary": {
+    "outer": [[0, 0], [240, 0], [240, 180], [0, 180]],
+    "holes": [[[25, 25], [55, 25], [55, 55], [25, 55]]]
+  },
+  "roads": [
+    {"id": "R_NS", "name": "南北计算走廊", "centerline": [[120, 0], [120, 180]], "total_width_m": 20},
+    {"id": "R_EW", "name": "东西计算走廊", "centerline": [[0, 90], [240, 90]], "total_width_m": 16}
+  ],
+  "sliver_threshold_m2": 10,
+  "parcel_attributes": {
+    "P001": {"land_use_code": "TEACH-R", "land_use_name": "居住教学假设", "far_max": 1.8, "coverage_max_pct": 30, "green_min_pct": 35, "height_max_m": 36},
+    "P002": {"land_use_code": "TEACH-S", "land_use_name": "公共服务教学假设", "far_max": 1.2, "coverage_max_pct": 35, "green_min_pct": 30, "height_max_m": 24},
+    "P003": {"land_use_code": "TEACH-R", "land_use_name": "居住教学假设", "far_max": 1.6, "coverage_max_pct": 30, "green_min_pct": 35, "height_max_m": 30},
+    "P004": {"land_use_code": "TEACH-M", "land_use_name": "待讨论混合用途"}
+  }
+}
