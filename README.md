@@ -1,85 +1,52 @@
-# 清规AI · PlanningWorkbench Open 0.2.0
+# 清规AI · PlanningWorkbench Open
 
-面向规划本科教学的独立开源 CAD 工作台：给定场地边界、道路几何和明确控制指标，生成可编辑道路、地块、指标表和单地块图则。支持本地交互页、命令行、Codex Skill 和 stdio MCP；确定性计算与 DXF 导出不需要模型 API。
+**让AI把规划参数变成可编辑的CAD成果。** 面向规划本科教学的原创开源工具：道路平面、路表横断面、地块切分、指标表、单地块图则，以及可追溯的校核和出图流程。
 
-**0.2.0 新增地块与图则完整操作页、地块拓扑与指标引擎、四工具 MCP、独立控规技能。** 地块例子是原创 240×180 米场地，含 30×30 米孔洞、两条道路和四个地块；它是 synthetic 教学输入，不代表北京大钟寺实测底图、法定红线或已批控制指标。源码采用 MIT。项目仓库：https://github.com/zc13026212687-rgb/planning-workbench-open 。
+本次 **Starter 0.3.1** 将已实战的四个专业技能、一个完整流程技能、确定性引擎与 **AutoCAD Native 0.3.0** 插件整理成可移植套件。源码 MIT；几何计算和DXF导出无需模型API。AI客户端、AutoCAD及其授权由使用者自行准备。
 
-完整源码包包含下述网页和桌面源码；独立技能/MCP 包只包含计算引擎、CLI、MCP、技能、例子与文档，使用“命令行生成与校核”和“安装新技能与连接 MCP”即可。
+## 下载、部署、开始画图
 
-## 获取源码与版本包
+**[下载 Windows 完整入门包](https://github.com/zc13026212687-rgb/planning-workbench-open/releases/download/v0.3.1/QingGuiAI-Starter-0.3.1-windows-x64.zip)** · [全部发行文件](https://github.com/zc13026212687-rgb/planning-workbench-open/releases/tag/v0.3.1)
 
-- **Windows 普通使用者优先下载 [最新版本中的 QingGui-AI-0.2.0-windows-x64.zip](https://github.com/zc13026212687-rgb/planning-workbench-open/releases/latest)**：完整解压，双击 `安装清规AI.cmd` 创建桌面入口，再打开“清规AI · PlanningWorkbench Open 0.2.0”。便携包已包含独立 Python、依赖和完整界面，不需另装 Python、Node 或 .NET。
-- 使用 Git：`git clone https://github.com/zc13026212687-rgb/planning-workbench-open.git`
-- 或在本页 **Code → Download ZIP** 获取源码。
-- [Releases](https://github.com/zc13026212687-rgb/planning-workbench-open/releases) 提供完整源码包和独立技能/MCP 包。
+1. 完整解压 Starter ZIP，双击 **Install-Codex.cmd**。Claude Code / OpenClaw 用户选择对应命名的入口。
+2. 查看部署回执，重启AI客户端会话，输入下面的示例。原生插件安装到稳定位置，运行时已内置；无需手动pip安装。
+3. 在 AutoCAD 2025 输入 **QGOPEN** 打开面板；**QGSPEC** 选择AI产出的参数JSON，或用 **QGROAD** 人工选择中心线绘图。
 
-下载后先解压并进入项目根目录，再执行下列安装步骤。AutoCAD 需要自行安装；确定性计算与 DXF 导出可独立运行。
+> 使用 qinggui-cad-workflow，检查清规AI引擎是否可用。在新目录生成合成道路平面、横断面、地块和P001图则，列出校核、缺失指标和成果。本次先导出DXF。
 
-便携版适用于 Windows 10/11 x64；源码版仍需准备依赖。桌面快捷方式启动本机浏览器工作台，提供道路平面、道路横断面、地块与图则三个入口。操作和构建步骤见 [Windows 便携版说明](docs/windows-portable.md)，本次验收见 [便携发行说明](docs/release-qinggui-0.2.0.md)，完整功能状态见 [功能证据与验收清单](docs/functional-coverage.md)。移动目录后重跑安装入口创建新快捷方式；已安装的技能另用 `install_skills.py --relocate-from 旧目录` 迁移和备份。
+完整安装要求、MCP接入、配置冲突与移除方法见 **[安装说明](docs/starter-installation.md)**。原生命令和构建入口见 [CAD插件](cad-native/README.md)。GitHub的 **Code → Download ZIP** 是源码，未包含大型运行时安装包；普通使用者请选择上面的Starter。
 
-## 从新操作页开始
+## 五个技能各做什么
 
-以下环境准备针对源码包；便携版可直接打开上述入口。源码包首次使用在项目根目录准备 Python 3.14 环境：
+| 技能 | 用途 |
+|---|---|
+| `qinggui-cad-workflow` | 串联资料核验、三种协作方式、道路—断面—地块—图则与验收 |
+| `beijing-regulatory-cad` | 组织单位、坐标、依据、保留条件和缺项 |
+| `planning-cad-road-plan` | 已知中心线与宽度 → 道路边界、真圆弧、限定T/X路口 |
+| `planning-cad-cross-section` | 组件宽度、横坡、高程 → 道路路表横断面 |
+| `planning-cad-regulatory-suite` | 边界与道路走廊 → 地块、面积、指标与单地块图则 |
 
-```powershell
-py -3.14 -m venv .venv
-.\.venv\Scripts\python.exe -m pip install -r requirements.lock.txt
-```
+技能负责让AI正确组织任务；引擎进行可复算的几何计算；原生插件在CAD生成标准可编辑实体。CLI与四工具stdio MCP也可以独立导出DXF。MCP新图通道与原生选线命令是不同入口，MCP不自动读取CAD当前选择集。
 
-随后双击 **启动地块与图则.cmd**。旧启动文件名保留兼容，窗口内统一显示“清规AI”。该入口打开本机 `/regulatory` 页面；这一页使用原生 HTML，不需要安装 Node 或构建桌面宿主。常规运行以项目 `.venv` 为解释器；本机另行配置的解释器定位文件不会进入公开包。
+## 课堂里怎样用
 
-页面顶部提供“道路平面／道路横断面／地块与图则”入口。地块页按“参数 → 预览 → 指标归属 → 校核 → 成果”操作：
+学生可以选择 **AI提出候选方案、AI给方案后人工选择、自己画中心线再辅助细化**。道路细化后检查断面总宽，地块切分后检查面积和指标归属，最后在CAD回读并保存成果。具体步骤见 [控规课程流程](docs/teaching-workflow.md) 和技能内的 [第一堂课练习](share-skills/qinggui-cad-workflow/references/quickstart.md)。
 
-1. 加载原创案例，检查边界、孔洞、单位与道路总宽。修改后重新生成，旧预览会标明待更新。
-2. 点击地块查看面积、输入用地说明和控制指标。缺失值保持为空；计容面积上限只按输入容积率计算，不等于实际建筑面积。
-3. 查看总图、单地块图则与面积平衡。已绑定指标的地块几何改变时，需要重新核对指标归属，不能按编号直接沿用。
-4. 校核无阻断错误后导出成果 ZIP：原生可编辑 DXF、地块 CSV/JSON、参数、质量报告与逐地块图则。默认例子得到四张图则，其他输入按实际地块数生成。
-5. 需要 CAD 时使用“CAD 新图落图并保存”。该操作使用 AutoCAD ActiveX 新建独立图纸并保存 DWG，结果以实际回读为准。
+公开示例是合成教学数据，不包含私人课程底图，也不代表北京大钟寺实测范围、已批红线或法定指标。真实项目使用自己有权使用的资料，完成定标、边界与依据核对后再设计。一级/二级/三级是可讨论的课程分级，不能自动替代法定道路等级。
 
-完整桌面工作台仍保留道路、横断面、资料检索与模型接口。源码包不含已编译桌面程序；需要它时按 `desktop/Setup.ps1` 的依赖检查与构建流程准备 Node、.NET 与 WebView2。新地块页和 CLI 不依赖桌面构建。
+## 已验证什么，还有哪些边界
 
-## 命令行生成与校核
+- AutoCAD 2025 原生验收记录：**87个实体（道路34、断面39、地块14）**，保存重读87，撤销/重做 **87→0→87**。见 [脱敏验收记录](docs/native-verification.md)。
+- 本版安装/技能/协议及合成成果复现结果见 [Starter发行记录](docs/release-0.3.1.md)。技能已安装、客户端已发现、CAD已绘图是不同验收层。
+- 限定直线T/X路口、独立真圆弧、路表横断面、地块与基础图则已有实现；复杂路网自动优化、竖向土方、管线综合、所有地方标准和商业软件全模块不在本版已验收范围。
+- 手动选取几何命令尚未全覆盖验收，最终响应式面板修改仍缺逐像素复查。其他CAD版本与其他电脑需要重新验证。
 
-```powershell
-.\.venv\Scripts\python.exe planning_cli.py cases
-.\.venv\Scripts\python.exe planning_cli.py validate --spec examples/regulatory-parcels.json
-.\.venv\Scripts\python.exe planning_cli.py generate --spec examples/regulatory-parcels.json --out data/parcel-lesson-01
-.\.venv\Scripts\python.exe planning_cli.py sheet --spec examples/regulatory-parcels.json --parcel P001 --out data/parcel-sheet-01
-.\.venv\Scripts\python.exe planning_cli.py generate --case regulatory-road-plan --variant oblique-t60 --out data/road-lesson-01
-.\.venv\Scripts\python.exe planning_cli.py generate --case road-cross-section --out data/section-lesson-01
-```
+我们把 SketchUp、3ds Max、QGIS、ArcPy 的历史成功接入方法整理成了 [可选设计工具经验](docs/optional-design-tools.md)。这些工具不是首发必装依赖；未核清许可或仅有安装文本的第三方技能不混装进来。完整来源与证据分级见 [技能盘点](docs/skill-inventory.md)。
 
-各输出目录必须是新的。已明确要求 CAD 落图时，可为 `generate` 或 `sheet` 加 `--cad-new`；未加时只输出文件。COM 写入需要 Windows、可用的 AutoCAD 和 pywin32；本轮真实落图验收环境为 AutoCAD 2025，其他 CAD 产品或版本需另行验证。几何通过不等于规划合规，错误方案不会输出为合格 DXF。
+## 开发与许可
 
-道路平面支持明确范围内的直线、独立真圆弧及同标高直路 T/X 口；横断面根据组成宽度、横坡和基准高程累加。地块的道路计算走廊用于面切分，不自动代表法定红线，也不替代道路平面模块的路口设计。参数结构见 [地块输入说明](docs/regulatory-schema.md)，适用边界见 [原创实现范围](docs/open-implementation.md) 与 [几何限制](docs/geometry-limitations.md)。
+`share-skills/` 是可分发技能；`deploy/` 是安装与只读诊断；`app/`、`planning_cli.py`、`planning_mcp.py` 是计算引擎与接口；`cad-native/` 是原生插件/安装器/启动器源码。旧0.2.0网页/浏览器便携入口保留，使用说明见 [旧版文档](docs/legacy-web-0.2.0.md)。
 
-## 安装新技能与连接 MCP
+本仓库原创源码使用 [MIT License](LICENSE)，第三方Python依赖保留各自许可；运行时与依赖清单封装在原生安装包中。AutoCAD、第三方软件与专有图块/素材不随仓库分发；本项目不依赖湘源程序或破解文件。
 
-仅安装新增技能，不改动原来的三个技能入口：
-
-```powershell
-.\.venv\Scripts\python.exe install_skills.py --only planning-cad-regulatory-suite
-```
-
-安装器默认写入当前用户的 `.agents/skills/planning-cad-regulatory-suite`。Windows 下优先使用项目现存的 `runtime/python.exe`，没有时使用 `.venv/Scripts/python.exe`；其他系统仍使用 `.venv/bin/python`。如使用已有虚拟环境，可加 `--python 解释器完整路径`；该本机定位信息只保存在安装后的 wrapper 中。安装器拒绝覆盖其他引擎来源的同名技能。新开会话后可使用：
-
-```text
-使用 $planning-cad-regulatory-suite。
-读取原创 regulatory-parcels 案例，校核边界、孔洞、地块指标和面积平衡。
-生成新的 DXF、地块表和四张图则，并解释哪些指标只是课堂假设。
-```
-
-`install_skills.py --only` 支持多个公开技能名；省略时选择所有四个入口。已有旧引擎技能需要保留时，使用上面的单技能命令。MCP 是单独的客户端连接配置，安装 Skill 不会自动注册它。
-
-本项目的 stdio MCP 提供四个真实工具：`planning_cases`、`planning_validate`、`planning_export`、`planning_export_control_sheet`。详情及客户端配置见 [MCP 使用说明](docs/mcp-usage.md)。MCP 默认只计算和导出；CAD 新图操作要求 `cad_new=true` 与 `confirm_cad_new=true`。目前未声称所有 MCP 客户端都已兼容验收。
-
-## 测试与公开源码包
-
-```powershell
-.\.venv\Scripts\python.exe -m pytest -q
-.\.venv\Scripts\python.exe build_release.py
-```
-
-打包器生成完整源码包与独立技能/MCP 包，写入逐文件 SHA-256 清单，并回读压缩包校验。白名单包含原创源码、合成例子、技能、测试、公开来源元数据与文档；排除用户资料、课堂底图、商业程序、注册材料、`.venv`、`node_modules`、`data`、`evidence`、编译产物和本机绝对用户路径。项目根旧 `source-manifest.json` 不进入包，发行包生成新的清单。
-
-本项目围绕控规常见任务独立实现计算与交互。对商业产品的本机菜单观察属于功能需求调查，未完成其付费流程对照、行为等价性或性能评测；不宣称完整复刻湘源。规范条目、真实场地测绘和授权资料仍需独立核实。详见 [0.2.0 更新](docs/release-0.2.0.md) 和 [实现及开源边界](docs/open-implementation.md)。
+从干净源码构建原生插件需自己的AutoCAD SDK和相应.NET构建工具，见 [构建说明](cad-native/BUILD.md)。Starter重打包使用 `build_starter.py --native-installer <已验证EXE路径> --out <新目录>`，会校验固定EXE哈希、扫描公开源码路径、生成逐文件清单与ZIP哈希。

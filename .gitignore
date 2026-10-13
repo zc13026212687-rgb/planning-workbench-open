@@ -23,3 +23,11 @@ source-manifest.json
 *.dwl2
 *.sqlite3
 *.db
+
+cad-native/**/bin/
+cad-native/**/obj/
+cad-native/build/
+cad-native/package-release/
+cad-native/source-release/
+payload/
+starter-receipts/

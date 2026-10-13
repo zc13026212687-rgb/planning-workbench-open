@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ApplicationPackage SchemaVersion="1.0" AutodeskProduct="AutoCAD" Name="清规AI" Description="原创控规道路、横断面、地块及图则工具" AppVersion="0.3.0" ProductCode="{D02F03E5-7747-4D31-BF22-96FE92E84917}" UpgradeCode="{BC871090-AC1D-4D0F-914B-73581461FDA1}" Author="PlanningWorkbench Open Contributors">
+  <CompanyDetails Name="PlanningWorkbench Open" Url="https://github.com/zc13026212687-rgb/planning-workbench-open" />
+  <Components Description="清规AI AutoCAD 2025 原生插件">
+    <ComponentEntry AppName="QingGuiAI.Cad" Version="0.3.0" ModuleName="./Contents/Windows/QingGuiAI.Cad.dll" AppType=".Net" LoadOnAutoCADStartup="True" LoadOnCommandInvocation="True">
+      <RuntimeRequirements OS="Win64" Platform="AutoCAD*" SeriesMin="R25.0" SeriesMax="R25.0" />
+      <Commands GroupName="QingGuiAI">
+        <Command Global="QGOPEN" Local="QGOPEN" />
+        <Command Global="QGROAD" Local="QGROAD" />
+        <Command Global="QGROADDEMO" Local="QGROADDEMO" />
+        <Command Global="QGSECTION" Local="QGSECTION" />
+        <Command Global="QGPARCEL" Local="QGPARCEL" />
+        <Command Global="QGPARCELDEMO" Local="QGPARCELDEMO" />
+        <Command Global="QGSPEC" Local="QGSPEC" />
+        <Command Global="QGSHEET" Local="QGSHEET" />
+        <Command Global="QGABOUT" Local="QGABOUT" />
+        <Command Global="QGSELFTEST" Local="QGSELFTEST" />
+      </Commands>
+    </ComponentEntry>
+  </Components>
+</ApplicationPackage>

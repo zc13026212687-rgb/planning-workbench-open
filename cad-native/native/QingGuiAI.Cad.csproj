@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <UseWindowsForms>true</UseWindowsForms>
+    <UseWPF>true</UseWPF>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <AssemblyName>QingGuiAI.Cad</AssemblyName>
+    <RootNamespace>QingGuiAI.Cad</RootNamespace>
+    <Version>0.3.0</Version>
+    <PlatformTarget>x64</PlatformTarget>
+    <RestoreIgnoreFailedSources>true</RestoreIgnoreFailedSources>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="AcMgd"><HintPath>$(AutoCADSdkDir)\AcMgd.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="AcDbMgd"><HintPath>$(AutoCADSdkDir)\AcDbMgd.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="AcCoreMgd"><HintPath>$(AutoCADSdkDir)\AcCoreMgd.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="AdWindows"><HintPath>$(AutoCADSdkDir)\AdWindows.dll</HintPath><Private>false</Private></Reference>
+  </ItemGroup>
+  <Target Name="RequireAutoCADSdk" BeforeTargets="ResolveReferences">
+    <Error Condition="'$(AutoCADSdkDir)' == '' Or !Exists('$(AutoCADSdkDir)/AcMgd.dll')" Text="Supply -p:AutoCADSdkDir=YOUR_AUTOCAD_2025_INSTALL_DIRECTORY; Autodesk SDK DLLs are not redistributed." />
+  </Target>
+</Project>
