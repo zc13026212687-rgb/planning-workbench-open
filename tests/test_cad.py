@@ -100,6 +100,76 @@ def test_inspect_without_running_cad_does_not_launch_it():
     assert result["connected"] is False and result["document"] is None
 
 
+def test_connect_rewraps_cached_active_application_in_dynamic_dispatch(monkeypatch):
+    bridge = CadBridge.__new__(CadBridge)
+    bridge._boot_error, bridge._app = None, None
+    raw_dispatch = object()
+    dynamic_app = SimpleNamespace(Version="25.0")
+    calls = []
+    bridge._retry = lambda action, **kwargs: action()
+    bridge._client = SimpleNamespace(
+        GetActiveObject=lambda progid: SimpleNamespace(_oleobj_=raw_dispatch),
+        dynamic=SimpleNamespace(Dispatch=lambda raw: calls.append(raw) or dynamic_app))
+    monkeypatch.setattr("app.cad.discover_installations", lambda: [{"progid": "AutoCAD.Application.25"}])
+    assert bridge._connect(False) is dynamic_app
+    assert bridge._connect(False) is dynamic_app
+    assert calls == [raw_dispatch]
+
+
+def test_launch_uses_dynamic_dispatch_without_cached_client_factory(monkeypatch):
+    bridge = CadBridge.__new__(CadBridge)
+    bridge._boot_error, bridge._app = None, None
+    calls = []
+    dynamic_app = SimpleNamespace(Visible=False)
+    bridge._retry = lambda action, **kwargs: action()
+
+    def unavailable(progid):
+        raise RuntimeError("No running instance")
+
+    bridge._client = SimpleNamespace(GetActiveObject=unavailable,
+        dynamic=SimpleNamespace(Dispatch=lambda progid: calls.append(progid) or dynamic_app))
+    monkeypatch.setattr("app.cad.discover_installations", lambda: [{"progid": "AutoCAD.Application.25"}])
+    assert bridge._connect(False) is None and not calls
+    assert bridge._connect(True) is dynamic_app and dynamic_app.Visible
+    assert calls == ["AutoCAD.Application.25"]
+
+
+def test_owned_readback_normalizes_cached_item_results_and_never_uses_com_iterator():
+    class ItemOnly:
+        def __init__(self, items):
+            self.items, self.Count = items, len(items)
+
+        def Item(self, index):
+            return self.items[index]
+
+        def __iter__(self):
+            raise AssertionError("COM iteration can reintroduce cached wrappers")
+
+    layer = SimpleNamespace(Name="ROAD_EDGE", Color=7, LayerOn=True, Freeze=False, Lock=False)
+    entity = SimpleNamespace(ObjectName="AcDbLine", Handle="1", Layer="ROAD_EDGE", Color=256,
+                             StartPoint=(0, 0, 0), EndPoint=(10, 0, 0))
+    # Even dynamic collections may return generated wrappers from Item().
+    layer_handle, entity_handle = object(), object()
+    cached_layer, cached_entity = SimpleNamespace(_oleobj_=layer_handle), SimpleNamespace(_oleobj_=entity_handle)
+    objects = {layer_handle: layer, entity_handle: entity}
+    doc = SimpleNamespace(Name="owned.dwg", ModelSpace=ItemOnly([cached_entity]), Layers=ItemOnly([cached_layer]),
+                          GetVariable=lambda key: 6)
+    bridge = CadBridge.__new__(CadBridge)
+    bridge._client = SimpleNamespace(dynamic=SimpleNamespace(Dispatch=objects.__getitem__))
+    bridge._documents = {"owned": {"doc": doc, "ids": {"1": "road-edge"}}}
+    result = bridge._read_document("owned")
+    assert result["entity_count"] == 1
+    assert result["layer_details"][0]["color_index"] == 7
+    assert result["entities"][0]["color_index"] == 256
+
+
+def test_com_result_boundary_preserves_scalar_and_container_results():
+    bridge = CadBridge.__new__(CadBridge)
+    bridge._client = SimpleNamespace(dynamic=SimpleNamespace(Dispatch=lambda value: pytest.fail("Not a COM object")))
+    for value in (None, 6, "simhei.ttf", (1.0, 2.0, 0.0), {"count": 2}):
+        assert bridge._retry(lambda: value) is value
+
+
 def test_inspection_limit_is_bounded_before_queueing():
     bridge = CadBridge.__new__(CadBridge)
     for limit in (0, 5001, True, 1.5):

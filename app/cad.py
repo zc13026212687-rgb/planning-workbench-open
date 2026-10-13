@@ -46,6 +46,14 @@ def _chinese_font_candidates():
     return [(fonts / filename, family) for filename, family in candidates if (fonts / filename).is_file()]
 
 
+def _font_file_property(style):
+    # IDispatch is case-insensitive, but pywin32's generated wrappers are not.
+    # AutoCAD 2025's type library exposes "fontFile"; dynamic dispatch also
+    # accepts the documented "FontFile" spelling. Do not alter COM caches.
+    properties = getattr(type(style), "_prop_map_get_", {})
+    return next((name for name in properties if name.casefold() == "fontfile"), "FontFile")
+
+
 def _digest(value) -> str:
     return hashlib.sha256(json.dumps(value, ensure_ascii=False, sort_keys=True,
                                     separators=(",", ":")).encode()).hexdigest()
@@ -252,7 +260,15 @@ class CadBridge:
         deadline = time.monotonic() + seconds
         while True:
             try:
-                return function()
+                result = function()
+                # Dynamic properties keep dynamic children, but pywin32's
+                # generated method bodies (Item/Add/HandleToObject, etc.) can
+                # wrap returned objects through the global makepy cache again.
+                # Normalize every COM result at this single call boundary.
+                dispatch = getattr(result, "_oleobj_", None)
+                if dispatch is not None:
+                    return self._client.dynamic.Dispatch(dispatch)
+                return result
             except Exception as exc:
                 # Retry only explicit COM call rejection, never arbitrary failure.
                 code = getattr(exc, "hresult", None)
@@ -273,7 +289,11 @@ class CadBridge:
         installations = discover_installations()
         for entry in installations:
             try:
-                self._app = self._client.GetActiveObject(entry["progid"])
+                active = self._client.GetActiveObject(entry["progid"])
+                # Generated makepy wrappers are case-sensitive (AutoCAD exposes
+                # e.g. "color" and "fontFile"). Keep the root AND every returned
+                # child in dynamic dispatch, without changing shared COM caches.
+                self._app = self._client.dynamic.Dispatch(active._oleobj_)
                 self._progid = entry["progid"]
                 return self._app
             except Exception:
@@ -283,7 +303,7 @@ class CadBridge:
         if not installations:
             raise CadError("AutoCAD ActiveX is not installed or registered")
         self._progid = installations[0]["progid"]
-        self._app = self._client.Dispatch(self._progid)
+        self._app = self._client.dynamic.Dispatch(self._progid)
         self._retry(lambda: setattr(self._app, "Visible", True), seconds=120)
         return self._app
 
@@ -384,6 +404,7 @@ class CadBridge:
                     "write_policy": "Only drawings created by this bridge instance may be written"}
         layer_count = int(self._retry(lambda: doc.Layers.Count))
         layers = []
+        # Use Count/Item: pywin32's COM iterator can reintroduce makepy wrappers.
         for i in range(min(layer_count, 4096)):
             layer = self._retry(lambda i=i: doc.Layers.Item(i))
             layers.append(self._retry(lambda: {"name": str(layer.Name), "on": bool(layer.LayerOn),
@@ -392,12 +413,15 @@ class CadBridge:
         total = int(self._retry(lambda: doc.ModelSpace.Count))
         entities, unsupported = [], []
         for i in range(min(total, max_entities)):
-            item = self._retry(lambda i=i: self._inspect_entity(doc.ModelSpace.Item(i)))
+            obj = self._retry(lambda i=i: doc.ModelSpace.Item(i))
+            item = self._retry(lambda: self._inspect_entity(obj))
             (unsupported if item["type"] == "unsupported" else entities).append(item)
         pickfirst = self._retry(lambda: doc.PickfirstSelectionSet)
         selected_count = int(self._retry(lambda: pickfirst.Count))
-        selected = [self._retry(lambda i=i: self._inspect_entity(pickfirst.Item(i)))
-                    for i in range(min(selected_count, max_entities))]
+        selected = []
+        for i in range(min(selected_count, max_entities)):
+            obj = self._retry(lambda i=i: pickfirst.Item(i))
+            selected.append(self._retry(lambda: self._inspect_entity(obj)))
         consistent = self._retry(lambda: app.ActiveDocument._oleobj_ == doc._oleobj_)
         if (any(e["object_name"] != "AcDbText" for e in unsupported) or total > max_entities
                 or any(not e["is_2d_planar"] for e in entities)
@@ -448,24 +472,33 @@ class CadBridge:
         if not candidates:
             raise CadError("No supported Windows Chinese TrueType font is installed")
         style = self._retry(lambda: doc.TextStyles.Add(name))
+        font_property = _font_file_property(style)
         accepted = False
+        failures = []
         try:
             for font, family in candidates:
+                stage = "font_file_write"
                 try:
-                    self._retry(lambda: setattr(style, "FontFile", str(font)))
+                    self._retry(lambda: setattr(style, font_property, str(font)))
+                    stage = "set_font"
                     self._retry(lambda: style.SetFont(family, False, False, 134, 0))
-                    actual = str(self._retry(lambda: style.FontFile))
+                    stage = "font_file_readback"
+                    actual = str(self._retry(lambda: getattr(style, font_property)))
                     if Path(actual).name.casefold() != font.name.casefold():
+                        failures.append(f"{font.name}: readback_mismatch ({Path(actual).name})")
                         continue
+                    stage = "style_properties"
                     self._retry(lambda: setattr(style, "Height", 0.0))
                     self._retry(lambda: setattr(style, "Width", 1.0))
                     self._retry(lambda: setattr(style, "ObliqueAngle", 0.0))
+                    stage = "activate_style"
                     self._retry(lambda: setattr(doc, "ActiveTextStyle", style))
                     accepted = True
                     return {"name": name, "font_file": actual, "family": family, "chinese_truetype": True}
-                except Exception:
+                except Exception as exc:
+                    failures.append(f"{font.name}: {stage}: {type(exc).__name__}: {str(exc)[:256]}")
                     continue
-            raise CadError("AutoCAD could not confirm an installed Chinese TrueType font")
+            raise CadError("AutoCAD could not confirm an installed Chinese TrueType font; " + "; ".join(failures))
         finally:
             if not accepted:
                 try:
@@ -548,9 +581,12 @@ class CadBridge:
         count = int(self._retry(lambda: doc.ModelSpace.Count))
         if count > 20000:
             raise CadError("Owned drawing exceeds the 20000-entity readback limit")
-        entities = [self._retry(lambda i=i: self._entity_info(doc.ModelSpace.Item(i), record["ids"]))
-                    for i in range(count)]
+        entities = []
+        for i in range(count):
+            obj = self._retry(lambda i=i: doc.ModelSpace.Item(i))
+            entities.append(self._retry(lambda: self._entity_info(obj, record["ids"])))
         layer_details = []
+        # Do not iterate the COM collection; Item preserves dynamic dispatch.
         for i in range(int(self._retry(lambda: doc.Layers.Count))):
             layer = self._retry(lambda i=i: doc.Layers.Item(i))
             layer_details.append(self._retry(lambda: {"name": str(layer.Name), "color_index": int(layer.Color),
@@ -563,7 +599,8 @@ class CadBridge:
                     "units": units}
         if record.get("text_style"):
             style = self._retry(lambda: doc.TextStyles.Item(record["text_style"]["name"]))
-            snapshot["text_style"] = self._retry(lambda: {"name": str(style.Name), "font_file": str(style.FontFile),
+            font_property = _font_file_property(style)
+            snapshot["text_style"] = self._retry(lambda: {"name": str(style.Name), "font_file": str(getattr(style, font_property)),
                                                           "height": float(style.Height), "width": float(style.Width)})
         return {"document_id": document_id, "name": str(self._retry(lambda: doc.Name)),
                 "owned": True, "entity_count": count, "unit_name": "metres" if units == 6 else "other",

@@ -1,6 +1,6 @@
 ---
 name: road-cross-section
-description: 根据用户明确的组成宽度、顺序、横坡与中心高程生成可编辑道路路表横断面；适用于参数化教学和方案研究。
+description: 在清规AI中根据用户明确的组成宽度、顺序、横坡与中心高程生成可编辑道路路表横断面；适用于参数化教学和方案研究。
 ---
 
 使用工作台固定 section 执行器，即 app.sections.generate。CAD X 是偏距，左负右正；CAD Y 是以米计的高程。纵横比例均为 1:1。

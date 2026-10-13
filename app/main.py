@@ -26,7 +26,7 @@ def create_app(data_dir=None,token=None):
         for event in list(jobs.cancel_flags.values()):event.set()
         jobs.pool.shutdown(wait=False,cancel_futures=True)
         cad.close()
-    app=FastAPI(title='规绘 · Planning Studio',lifespan=lifespan)
+    app=FastAPI(title='清规AI · PlanningWorkbench Open 0.2.0',lifespan=lifespan)
     app.state.store=store;app.state.jobs=jobs;app.state.cad=cad;app.state.token=local_token
     @app.middleware('http')
     async def local_boundary(request:Request,call_next):

@@ -1,4 +1,4 @@
-param([switch]$CheckOnly, [switch]$NoBrowser)
+param([switch]$CheckOnly, [switch]$DependenciesOnly, [switch]$NoBrowser, [ValidateSet('main','regulatory')][string]$Page = 'regulatory')
 
 # A local, movable launcher. No installation, no hard-coded user paths.
 # A server is reused only when its PID belongs to this exact run_server.py
@@ -43,13 +43,18 @@ function Test-PythonImports([string]$Executable) {
 
 function Find-Python {
     $candidates = New-Object 'System.Collections.Generic.List[string]'
+    $candidates.Add((Join-Path $projectRoot 'runtime\python.exe'))
     $candidates.Add((Join-Path $projectRoot '.venv\Scripts\python.exe'))
     if (Test-Path -LiteralPath $engineConfig -PathType Leaf) {
-        $config = Get-Content -LiteralPath $engineConfig -Raw -Encoding UTF8 | ConvertFrom-Json
-        if ($config.python_executable) {
-            $configured = Resolve-LocalPath ([string]$config.python_executable)
-            if ($configured) { $candidates.Add($configured) }
-        }
+        # A copied machine-specific config must not prevent a ready portable
+        # runtime from being used. The config itself is never rewritten here.
+        try {
+            $config = Get-Content -LiteralPath $engineConfig -Raw -Encoding UTF8 | ConvertFrom-Json
+            if ($config.python_executable) {
+                $configured = Resolve-LocalPath ([string]$config.python_executable)
+                if ($configured) { $candidates.Add($configured) }
+            }
+        } catch {}
     }
     $pathPython = Get-Command python.exe -ErrorAction SilentlyContinue
     if ($pathPython -and $pathPython.Source) { $candidates.Add($pathPython.Source) }
@@ -62,55 +67,90 @@ function Find-Python {
             background = $(if (Test-Path -LiteralPath $windowless -PathType Leaf) { $windowless } else { $candidate })
         }
     }
-    throw 'No ready Python environment was found. Run the existing dependency-check entry, or set python_executable in local-engine.json to a prepared Python environment. Nothing was installed.'
+    throw 'No ready Python environment was found. Run InstallQingGui.ps1, use the complete portable package, or set python_executable in local-engine.json to a prepared Python environment. Nothing was installed by this launcher.'
 }
 
-function Read-OwnedServer {
-    if (!(Test-Path -LiteralPath $stateFile -PathType Leaf)) { return $null }
+function Read-ServerState {
+    # Inspection is read-only, including for copied records of live services.
+    # A foreign PID is never contacted and is never a dependency failure.
+    $status = [PSCustomObject]@{ state = 'missing'; server = $null }
+    if (!(Test-Path -LiteralPath $stateFile -PathType Leaf)) { return $status }
+    $status.state = 'invalid'
     try { $record = Get-Content -LiteralPath $stateFile -Raw -Encoding UTF8 | ConvertFrom-Json }
-    catch { return $null }
+    catch { return $status }
     $serverPid = 0; $serverPort = 0
-    if (![int]::TryParse([string]$record.pid, [ref]$serverPid) -or $serverPid -le 0) { return $null }
-    if (![int]::TryParse([string]$record.port, [ref]$serverPort) -or $serverPort -lt 1 -or $serverPort -gt 65535) { return $null }
-    if ($record.application -ne 'planning-workbench' -or [string]::IsNullOrWhiteSpace([string]$record.token)) { return $null }
-    $processInfo = Get-CimInstance Win32_Process -Filter "ProcessId=$serverPid" -ErrorAction SilentlyContinue
-    if (!$processInfo) { return $null }
+    if (![int]::TryParse([string]$record.pid, [ref]$serverPid) -or $serverPid -le 0) { return $status }
+    if (![int]::TryParse([string]$record.port, [ref]$serverPort) -or $serverPort -lt 1 -or $serverPort -gt 65535) { return $status }
+    if ($record.application -ne 'planning-workbench' -or [string]::IsNullOrWhiteSpace([string]$record.token)) { return $status }
+    if ($record.root) {
+        try {
+            $recordRoot = [IO.Path]::GetFullPath([string]$record.root).TrimEnd('\')
+            if ($recordRoot -ine $projectRoot.TrimEnd('\')) { $status.state = 'foreign'; return $status }
+        } catch { return $status }
+    }
+    try { $processInfo = Get-CimInstance Win32_Process -Filter "ProcessId=$serverPid" -ErrorAction Stop }
+    catch { $status.state = 'unverifiable'; return $status }
+    if (!$processInfo) { $status.state = 'stale'; return $status }
+    if ([string]::IsNullOrWhiteSpace([string]$processInfo.CommandLine)) { $status.state = 'unverifiable'; return $status }
     $commandLine = ([string]$processInfo.CommandLine).Replace('/', '\')
     $expectedScript = $serverScript.Replace('/', '\')
+    # Require the whole absolute script argument, not a substring path match.
+    $scriptArgument = '(?i)(?:^|\s)(?:"' + [Regex]::Escape($expectedScript) + '"|' + [Regex]::Escape($expectedScript) + ')(?=\s|$)'
     if ($processInfo.Name -notmatch '^pythonw?([0-9.]*)?\.exe$' -or
-        $commandLine.IndexOf($expectedScript, [StringComparison]::OrdinalIgnoreCase) -lt 0) {
-        throw 'The live service record does not belong to this project. The launcher will not reuse or replace that service. Check this project data/server.json.'
+        $commandLine -notmatch $scriptArgument) {
+        $status.state = 'foreign'; return $status
     }
     $baseUrl = 'http://127.0.0.1:' + $serverPort
     $ownedRecord = [PSCustomObject]@{ pid = $serverPid; port = $serverPort; token = [string]$record.token; base_url = $baseUrl; ready = $false }
+    $status.state = 'owned'; $status.server = $ownedRecord
     try {
         $health = Invoke-RestMethod -Uri ($baseUrl + '/health') -TimeoutSec 3
-        if ($health.application -ne 'planning-workbench' -or $health.status -ne 'ok') { return $ownedRecord }
+        if ($health.application -ne 'planning-workbench' -or $health.status -ne 'ok') { return $status }
         $example = Invoke-RestMethod -Uri ($baseUrl + '/api/regulatory/example') -Headers @{ 'X-Local-Token' = [string]$record.token } -TimeoutSec 4
-        if ($example.kind -ne 'regulatory_parcels') { return $ownedRecord }
+        if ($example.kind -ne 'regulatory_parcels') { return $status }
         $ownedRecord.ready = $true
-        return $ownedRecord
-    } catch { return $ownedRecord }
+        return $status
+    } catch { return $status }
+}
+
+function Preserve-PreviousState {
+    if (!(Test-Path -LiteralPath $stateFile -PathType Leaf)) { return }
+    $archiveName = 'server.previous-' + [DateTime]::UtcNow.ToString('yyyyMMddTHHmmssfffZ') + '-' + [Guid]::NewGuid().ToString('N').Substring(0,8) + '.json'
+    $archivePath = [IO.Path]::GetFullPath((Join-Path $dataDir $archiveName))
+    if ((Split-Path -Parent $archivePath) -ine [IO.Path]::GetFullPath($dataDir)) { throw 'The previous-state archive must remain inside this project data directory.' }
+    # Preserve the exact local state for review; do not edit, stop, or contact
+    # the process described by the old record. This runs only under the mutex.
+    Move-Item -LiteralPath $stateFile -Destination $archivePath -ErrorAction Stop
 }
 
 try {
     if (!(Test-Path -LiteralPath $serverScript -PathType Leaf)) { throw 'run_server.py is missing. Keep the launcher inside the complete project folder.' }
-    $pythonRuntime = Find-Python
-    $server = Read-OwnedServer
-    if ($CheckOnly) {
-        [PSCustomObject]@{ python_ready = $true; project = $projectRoot; server_ready = [bool]($server -and $server.ready); server_belongs_to_project = [bool]$server } | ConvertTo-Json -Compress
-        exit 0
+    $pythonRuntime = $null; $dependencyError = $null
+    try { $pythonRuntime = Find-Python } catch { $dependencyError = $_.Exception.Message }
+    if ($DependenciesOnly) {
+        [PSCustomObject]@{ python_ready = [bool]$pythonRuntime; dependency_error = $dependencyError; project = $projectRoot; server_checked = $false; writes_performed = $false } | ConvertTo-Json -Compress
+        exit $(if ($pythonRuntime) { 0 } else { 2 })
     }
+    $serviceState = Read-ServerState
+    $server = $serviceState.server
+    if ($CheckOnly) {
+        [PSCustomObject]@{ python_ready = [bool]$pythonRuntime; dependency_error = $dependencyError; project = $projectRoot; main_ui_ready = (Test-Path -LiteralPath (Join-Path $projectRoot 'web\dist\index.html') -PathType Leaf); server_ready = [bool]($server -and $server.ready); server_belongs_to_project = [bool]$server; server_state = $serviceState.state; writes_performed = $false } | ConvertTo-Json -Compress
+        exit $(if ($pythonRuntime) { 0 } else { 2 })
+    }
+    if (!$pythonRuntime) { throw $dependencyError }
     $hash = [Security.Cryptography.SHA256]::Create()
     try { $key = ([BitConverter]::ToString($hash.ComputeHash([Text.Encoding]::UTF8.GetBytes($projectRoot.ToLowerInvariant())))).Replace('-', '').Substring(0,24) }
     finally { $hash.Dispose() }
     $launchMutex = New-Object Threading.Mutex($false, ('Local\PlanningRegulatory_' + $key))
     try { $mutexOwned = $launchMutex.WaitOne(45000) } catch [Threading.AbandonedMutexException] { $mutexOwned = $true }
     if (!$mutexOwned) { throw 'Another launch is still preparing this workbench. Please wait and open it again.' }
-    $server = Read-OwnedServer
+    $serviceState = Read-ServerState
+    if ($serviceState.state -eq 'unverifiable') { throw 'The local service record could not be verified. No service was stopped or replaced. Check read access to the recorded process before retrying.' }
+    $server = $serviceState.server
     $backendProcess = $null
     if (!$server) {
         if (!(Test-Path -LiteralPath $dataDir -PathType Container)) { New-Item -ItemType Directory -Path $dataDir | Out-Null }
+        Preserve-PreviousState
         $previousData = $env:PLANNING_DATA_DIR
         $previousUtf8 = $env:PYTHONUTF8
         try {
@@ -127,24 +167,26 @@ try {
         $deadline = [DateTime]::UtcNow.AddSeconds(40)
         do {
             Start-Sleep -Milliseconds 350
-            $server = Read-OwnedServer
+            $serviceState = Read-ServerState
+            $server = $serviceState.server
             if ($server -and $server.ready) { break }
             if ($backendProcess -and $backendProcess.HasExited) { throw 'The local service exited before it became ready. Review data/backend.log; no CAD operation was started.' }
         } while ([DateTime]::UtcNow -lt $deadline)
         if (!$server -or !$server.ready) { throw 'The local service did not become ready in time. Review data/backend.log before retrying; the launcher did not stop any existing CAD or server process.' }
     }
     if (!$NoBrowser) {
-        $targetUrl = $server.base_url + '/regulatory#token=' + [Uri]::EscapeDataString($server.token)
+        $startPath = if ($Page -eq 'main') { '/' } else { '/regulatory' }
+        $targetUrl = $server.base_url + $startPath + '#token=' + [Uri]::EscapeDataString($server.token)
         Start-Process -FilePath $targetUrl | Out-Null
     }
-    if ($NoBrowser) { Write-Output 'Ready: this project regulatory workbench is running on loopback. No browser was opened.' }
+    if ($NoBrowser) { Write-Output 'Ready: this project workbench is running on loopback. No browser was opened.' }
 } catch {
     $message = $_.Exception.Message
-    if ($CheckOnly -or $NoBrowser) { Write-Error $message -ErrorAction Continue }
+    if ($CheckOnly -or $DependenciesOnly -or $NoBrowser) { Write-Error $message -ErrorAction Continue }
     else {
         try {
             Add-Type -AssemblyName System.Windows.Forms
-            [Windows.Forms.MessageBox]::Show($message, 'Planning Studio - Launch', [Windows.Forms.MessageBoxButtons]::OK, [Windows.Forms.MessageBoxIcon]::Information) | Out-Null
+            [Windows.Forms.MessageBox]::Show($message, 'QingGui AI - Launch', [Windows.Forms.MessageBoxButtons]::OK, [Windows.Forms.MessageBoxIcon]::Information) | Out-Null
         } catch { Write-Error 'The workbench could not start. Run desktop/LaunchRegulatory.ps1 -CheckOnly for a read-only check.' -ErrorAction Continue }
     }
     exit 1

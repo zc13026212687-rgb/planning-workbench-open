@@ -38,7 +38,7 @@ public partial class App : Application
         {
             if (MainWindow is { IsLoaded: true } window) { if (window.WindowState == WindowState.Minimized) window.WindowState = WindowState.Normal; window.Show(); window.Activate(); }
         })), null, Timeout.Infinite, false);
-        var progress = new Window { Title = "规绘 · Planning Studio", Width = 460, Height = 180, ResizeMode = ResizeMode.NoResize, WindowStartupLocation = WindowStartupLocation.CenterScreen, Background = new SolidColorBrush(Color.FromRgb(247,248,245)), Content = new TextBlock { Text = "正在准备本地设计空间…", FontSize = 18, VerticalAlignment = VerticalAlignment.Center, HorizontalAlignment = HorizontalAlignment.Center } };
+        var progress = new Window { Title = "清规AI · PlanningWorkbench Open", Width = 460, Height = 180, ResizeMode = ResizeMode.NoResize, WindowStartupLocation = WindowStartupLocation.CenterScreen, Background = new SolidColorBrush(Color.FromRgb(247,248,245)), Content = new TextBlock { Text = "正在准备本地设计空间…", FontSize = 18, VerticalAlignment = VerticalAlignment.Center, HorizontalAlignment = HorizontalAlignment.Center } };
         progress.Show();
         try
         {
@@ -89,7 +89,7 @@ public partial class App : Application
         catch (Exception ex)
         {
             progress.Close(); await StopOwnedServer();
-            MessageBox.Show(ex.Message, "规绘 · 启动未完成", MessageBoxButton.OK, MessageBoxImage.Warning); Shutdown(2);
+            MessageBox.Show(ex.Message, "清规AI · 启动未完成", MessageBoxButton.OK, MessageBoxImage.Warning); Shutdown(2);
         }
     }
     protected override void OnExit(ExitEventArgs e)

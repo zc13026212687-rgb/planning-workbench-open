@@ -16,7 +16,7 @@ public sealed class StudioWindow : Window
     private readonly TextBlock _status = new() { Text = "正在连接本地设计工作台…", FontSize = 17, Foreground = new SolidColorBrush(Color.FromRgb(70,100,80)), TextWrapping = TextWrapping.Wrap, HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center, Margin = new Thickness(50) };
     public StudioWindow(Uri target)
     {
-        _target = target; Title = "规绘 · Planning Studio";
+        _target = target; Title = "清规AI · PlanningWorkbench Open";
         Width = 1480; Height = 960; MinWidth = 920; MinHeight = 660;
         WindowStartupLocation = WindowStartupLocation.CenterScreen;
         Background = new SolidColorBrush(Color.FromRgb(247,248,245));

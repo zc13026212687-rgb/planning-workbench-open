@@ -76,3 +76,80 @@ def test_font_initialization_adds_isolated_style_without_mutating_standard(monke
     assert result["name"].startswith("PW_Chinese_")
     assert doc.ActiveTextStyle is created[0] and standard.FontFile == "txt.shx"
     assert created[0].FontFile == str(font) and created[0].Height == 0
+
+
+def test_makepy_fontfile_spelling_supports_initialization_and_owned_readback(monkeypatch, tmp_path):
+    """AutoCAD 2025's generated wrapper exposes fontFile, not FontFile."""
+    font = tmp_path / "simhei.ttf"
+    font.write_bytes(b"font fixture; not used by real CAD")
+    monkeypatch.setattr("app.cad._chinese_font_candidates", lambda: [(font, "SimHei")])
+
+    class CachedStyle:
+        __slots__ = ("Name", "fontFile", "Height", "Width", "ObliqueAngle")
+        _prop_map_get_ = {"Name": (), "fontFile": (), "Height": (), "Width": ()}
+
+        def __init__(self, name):
+            self.Name, self.fontFile = name, "txt.shx"
+
+        def SetFont(self, family, bold, italic, charset, pitch):
+            assert family == "SimHei" and self.fontFile == str(font)
+            self.fontFile = "simhei.ttf"
+
+    created = []
+
+    class Styles:
+        def Add(self, name):
+            style = CachedStyle(name)
+            created.append(style)
+            return style
+
+        def Item(self, name):
+            return next(style for style in created if style.Name == name)
+
+    standard = SimpleNamespace(Name="Standard", FontFile="txt.shx")
+    doc = SimpleNamespace(TextStyles=Styles(), ActiveTextStyle=standard, Name="owned.dwg",
+                          ModelSpace=SimpleNamespace(Count=0), Layers=SimpleNamespace(Count=0),
+                          GetVariable=lambda name: 6)
+    bridge = CadBridge.__new__(CadBridge)
+    bridge._retry = lambda action, **kwargs: action()
+    style_result = bridge._initialize_text_style(doc)
+    bridge._documents = {"owned": {"doc": doc, "ids": {}, "text_style": style_result}}
+    readback = bridge._read_document("owned")
+    assert style_result["chinese_truetype"] and style_result["font_file"] == "simhei.ttf"
+    assert readback["text_style"]["font_file"] == "simhei.ttf"
+    assert doc.ActiveTextStyle is created[0] and standard.FontFile == "txt.shx"
+
+
+def test_font_failure_retains_operation_cause_and_cleans_only_created_style(monkeypatch, tmp_path):
+    font = tmp_path / "simhei.ttf"
+    font.write_bytes(b"font fixture; not used by real CAD")
+    monkeypatch.setattr("app.cad._chinese_font_candidates", lambda: [(font, "SimHei")])
+    deleted = []
+
+    def fail_set_font(*args):
+        raise RuntimeError("controlled COM font failure")
+
+    style = SimpleNamespace(SetFont=fail_set_font, Delete=lambda: deleted.append(True))
+    standard = SimpleNamespace(Name="Standard", FontFile="txt.shx")
+    doc = SimpleNamespace(TextStyles=SimpleNamespace(Add=lambda name: style), ActiveTextStyle=standard)
+    bridge = CadBridge.__new__(CadBridge)
+    bridge._retry = lambda action, **kwargs: action()
+    with pytest.raises(CadError, match="simhei.ttf: set_font: RuntimeError: controlled COM font failure"):
+        bridge._initialize_text_style(doc)
+    assert deleted == [True] and doc.ActiveTextStyle is standard
+
+
+def test_font_substitution_is_still_rejected(monkeypatch, tmp_path):
+    font = tmp_path / "simhei.ttf"
+    font.write_bytes(b"font fixture; not used by real CAD")
+    monkeypatch.setattr("app.cad._chinese_font_candidates", lambda: [(font, "SimHei")])
+    deleted = []
+    style = SimpleNamespace(Delete=lambda: deleted.append(True))
+    style.SetFont = lambda *args: setattr(style, "FontFile", "txt.shx")
+    standard = SimpleNamespace(Name="Standard", FontFile="txt.shx")
+    doc = SimpleNamespace(TextStyles=SimpleNamespace(Add=lambda name: style), ActiveTextStyle=standard)
+    bridge = CadBridge.__new__(CadBridge)
+    bridge._retry = lambda action, **kwargs: action()
+    with pytest.raises(CadError, match="readback_mismatch.*txt.shx"):
+        bridge._initialize_text_style(doc)
+    assert deleted == [True] and doc.ActiveTextStyle is standard

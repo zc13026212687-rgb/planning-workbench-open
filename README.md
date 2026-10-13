@@ -1,4 +1,4 @@
-# 规绘 · PlanningWorkbench Open 0.2.0
+# 清规AI · PlanningWorkbench Open 0.2.0
 
 面向规划本科教学的独立开源 CAD 工作台：给定场地边界、道路几何和明确控制指标，生成可编辑道路、地块、指标表和单地块图则。支持本地交互页、命令行、Codex Skill 和 stdio MCP；确定性计算与 DXF 导出不需要模型 API。
 
@@ -8,24 +8,27 @@
 
 ## 获取源码与版本包
 
+- **Windows 普通使用者优先下载 [最新版本中的 QingGui-AI-0.2.0-windows-x64.zip](https://github.com/zc13026212687-rgb/planning-workbench-open/releases/latest)**：完整解压，双击 `安装清规AI.cmd` 创建桌面入口，再打开“清规AI · PlanningWorkbench Open 0.2.0”。便携包已包含独立 Python、依赖和完整界面，不需另装 Python、Node 或 .NET。
 - 使用 Git：`git clone https://github.com/zc13026212687-rgb/planning-workbench-open.git`
 - 或在本页 **Code → Download ZIP** 获取源码。
 - [Releases](https://github.com/zc13026212687-rgb/planning-workbench-open/releases) 提供完整源码包和独立技能/MCP 包。
 
 下载后先解压并进入项目根目录，再执行下列安装步骤。AutoCAD 需要自行安装；确定性计算与 DXF 导出可独立运行。
 
+便携版适用于 Windows 10/11 x64；源码版仍需准备依赖。桌面快捷方式启动本机浏览器工作台，提供道路平面、道路横断面、地块与图则三个入口。操作和构建步骤见 [Windows 便携版说明](docs/windows-portable.md)，本次验收见 [便携发行说明](docs/release-qinggui-0.2.0.md)，完整功能状态见 [功能证据与验收清单](docs/functional-coverage.md)。移动目录后重跑安装入口创建新快捷方式；已安装的技能另用 `install_skills.py --relocate-from 旧目录` 迁移和备份。
+
 ## 从新操作页开始
 
-首次使用在项目根目录准备 Python 3.14 环境：
+以下环境准备针对源码包；便携版可直接打开上述入口。源码包首次使用在项目根目录准备 Python 3.14 环境：
 
 ```powershell
 py -3.14 -m venv .venv
 .\.venv\Scripts\python.exe -m pip install -r requirements.lock.txt
 ```
 
-随后双击 **启动地块与图则.cmd**。该入口打开本机 `/regulatory` 页面；这一页使用原生 HTML，不需要安装 Node 或构建桌面宿主。常规运行以项目 `.venv` 为解释器；本机另行配置的解释器定位文件不会进入公开包。
+随后双击 **启动地块与图则.cmd**。旧启动文件名保留兼容，窗口内统一显示“清规AI”。该入口打开本机 `/regulatory` 页面；这一页使用原生 HTML，不需要安装 Node 或构建桌面宿主。常规运行以项目 `.venv` 为解释器；本机另行配置的解释器定位文件不会进入公开包。
 
-页面按“参数 → 预览 → 指标归属 → 校核 → 成果”操作：
+页面顶部提供“道路平面／道路横断面／地块与图则”入口。地块页按“参数 → 预览 → 指标归属 → 校核 → 成果”操作：
 
 1. 加载原创案例，检查边界、孔洞、单位与道路总宽。修改后重新生成，旧预览会标明待更新。
 2. 点击地块查看面积、输入用地说明和控制指标。缺失值保持为空；计容面积上限只按输入容积率计算，不等于实际建筑面积。
@@ -58,7 +61,7 @@ py -3.14 -m venv .venv
 .\.venv\Scripts\python.exe install_skills.py --only planning-cad-regulatory-suite
 ```
 
-安装器默认写入当前用户的 `.agents/skills/planning-cad-regulatory-suite`。如使用已有虚拟环境，可加 `--python 解释器完整路径`；该本机定位信息只保存在安装后的 wrapper 中。安装器拒绝覆盖其他引擎来源的同名技能。新开会话后可使用：
+安装器默认写入当前用户的 `.agents/skills/planning-cad-regulatory-suite`。Windows 下优先使用项目现存的 `runtime/python.exe`，没有时使用 `.venv/Scripts/python.exe`；其他系统仍使用 `.venv/bin/python`。如使用已有虚拟环境，可加 `--python 解释器完整路径`；该本机定位信息只保存在安装后的 wrapper 中。安装器拒绝覆盖其他引擎来源的同名技能。新开会话后可使用：
 
 ```text
 使用 $planning-cad-regulatory-suite。

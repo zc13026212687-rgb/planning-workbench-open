@@ -7,8 +7,8 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <AssemblyName>PlanningStudio</AssemblyName>
     <RootNamespace>PlanningStudio</RootNamespace>
-    <Version>0.1.1</Version>
-    <Product>规绘 · Planning Studio</Product>
+    <Version>0.2.0</Version>
+    <Product>清规AI · PlanningWorkbench Open</Product>
     <Description>Local planning and editable CAD teaching workbench</Description>
   </PropertyGroup>
   <ItemGroup>

@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#163d49">
-<title>规绘｜地块与图则</title>
+<title>清规AI · PlanningWorkbench Open 0.2.0｜地块与图则</title>
 <style>
 :root{--ink:#233b46;--muted:#637984;--line:#dce5e8;--paper:#fff;--bg:#f3f6f7;--teal:#167e75;--teal-soft:#e8f4f0;--blue:#426f91;--amber:#9b651d;--red:#b34040;--shadow:0 5px 22px #24444b09}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.55 "Microsoft YaHei","PingFang SC",system-ui,sans-serif}button,input,textarea,select{font:inherit}button,a,input,textarea,select{outline-offset:3px}button{border:1px solid var(--line);background:white;border-radius:7px;color:var(--ink);padding:9px 13px;cursor:pointer;font-weight:600;transition:background .15s,border-color .15s}button:hover:not(:disabled){background:#f1f7f7;border-color:#9ebbbd}button:disabled{opacity:.42;cursor:not-allowed}button.primary{background:var(--teal);border-color:var(--teal);color:white}button.primary:hover:not(:disabled){background:#116c64}button.dark{background:#284f5e;border-color:#284f5e;color:white}button.small{padding:5px 9px;font-size:12px}button.quiet{font-weight:400;background:transparent}a{color:var(--teal);text-decoration:none}a:hover{text-decoration:underline}input,select,textarea{border:1px solid #ccdadd;border-radius:6px;background:#fff;color:var(--ink);padding:8px 9px;min-width:0;width:100%}input:focus,select:focus,textarea:focus{border-color:var(--teal);outline:2px solid #167e7520}input[aria-invalid=true]{border-color:var(--red)}input:disabled,textarea:disabled,select:disabled{background:#f1f4f5;color:#819199}label{display:block;color:#5b707b;font-size:12px;margin:0 0 5px}h1,h2,h3,p{margin:0}h1{font-size:21px;font-weight:650;letter-spacing:.02em}h2{font-size:15px;font-weight:650}h3{font-size:13px;font-weight:650}.muted{color:var(--muted)}.small-text{font-size:12px}.mono{font-family:"Cascadia Code",Consolas,monospace}.tag{display:inline-flex;align-items:center;gap:5px;padding:3px 8px;border-radius:5px;background:#edf2f4;color:#58717c;font-size:11px;white-space:nowrap}.tag.teal{color:#16766e;background:var(--teal-soft)}.tag.warn{color:var(--amber);background:#fbf3e6}.tag.error{color:var(--red);background:#fbebeb}
@@ -22,8 +22,8 @@ details.param-details{border:1px solid var(--line);border-radius:9px;background:
 </head>
 <body>
 <header>
-  <div class="brand"><div class="brand-mark" aria-hidden="true"><i></i><i></i><i></i><i></i></div><div class="brand-copy"><h1>规绘 <span style="font-weight:400;color:#a5b5bb">｜</span> 地块与图则</h1><div class="muted">PLANNING STUDIO · REGULATORY DESIGN</div></div></div>
-  <div class="header-tools"><span class="tag teal" id="sourceTag">教学合成案例</span><button id="resetBtn" class="quiet">载入教学案例</button><a href="/" class="small-text" style="margin-left:5px">返回工作台 ↗</a></div>
+  <div class="brand"><div class="brand-mark" aria-hidden="true"><i></i><i></i><i></i><i></i></div><div class="brand-copy"><h1>清规AI <span style="font-weight:400;color:#a5b5bb">｜</span> 地块与图则</h1><div class="muted">PlanningWorkbench Open 0.2.0</div></div></div>
+  <div class="header-tools"><span class="tag teal" id="sourceTag">教学合成案例</span><button id="resetBtn" class="quiet">载入教学案例</button><a href="/?case=regulatory-road-plan" id="roadEntry" class="small-text">道路平面 ↗</a><a href="/?case=road-cross-section" id="sectionEntry" class="small-text">道路横断面 ↗</a><a href="/" id="workspaceEntry" class="small-text">返回工作台 ↗</a></div>
 </header>
 <div class="subbar"><div class="steps"><span><b>1</b>定义道路</span><em>→</em><span><b>2</b>生成地块</span><em>→</em><span><b>3</b>配置指标</span><em>→</em><span><b>4</b>校核与出图</span></div><div class="scope">每一次修改，保留明确的参数与计算结果</div></div>
 <main>
@@ -45,7 +45,7 @@ details.param-details{border:1px solid var(--line);border-radius:9px;background:
       <section class="panel"><div class="report-heading"><h2>数值校核与待办</h2><span class="tag" id="reportTag">未生成</span></div><div id="reportBody"><div class="panel-body"><p class="empty-line">重新生成后显示几何与指标检查。</p></div></div></section>
     </aside>
   </div>
-  <div class="footnote"><span>规绘 · 地块与图则工作页　/　参数、几何、表格与图则保持同一版本</span><span id="footerScope">教学合成数据；不代替场地调查与规划判断。</span></div>
+  <div class="footnote"><span>清规AI · PlanningWorkbench Open 0.2.0 · 地块与图则　/　参数、几何、表格与图则保持同一版本</span><span id="footerScope">教学合成数据；不代替场地调查与规划判断。</span></div>
 </main>
 <script>
 'use strict';
@@ -53,6 +53,7 @@ details.param-details{border:1px solid var(--line);border-radius:9px;background:
   const $ = id => document.getElementById(id);
   const sessionToken = new URLSearchParams(location.hash.slice(1)).get('token') || '';
   if (location.hash) history.replaceState(null, '', location.pathname + location.search);
+  for(const id of ['roadEntry','sectionEntry','workspaceEntry']){const entry=$(id);if(sessionToken)entry.href+= '#token='+encodeURIComponent(sessionToken);}
   const state = { spec:null, result:null, sheet:null, selected:null, dirty:true, jsonDirty:false, attributeDirty:false, roadDirty:false, busy:false, view:'map', zoom:1, revision:0, invalidEditor:false, bindingCandidate:null };
   const bindingPanel=document.createElement('div');bindingPanel.className='notice hidden';bindingPanel.id='bindingPanel';
   bindingPanel.innerHTML='<div style="margin-bottom:8px"><strong>地块几何已改变，原指标归属需要复核。</strong> 下图是新几何的审阅预览，旧绑定仍保留。请逐块核对编号、位置与指标；确认后才能导出。</div><button id="confirmBindingBtn" class="small">按当前几何重新确认指标归属</button>';
@@ -298,7 +299,7 @@ details.param-details{border:1px solid var(--line);border-radius:9px;background:
       const data=await api('/api/regulatory/export',{method:'POST',body:JSON.stringify({spec:state.spec,cad_new:cadNew,confirm_cad_new:cadNew})});
       const box=$('exportResult');box.replaceChildren();box.classList.remove('hidden');
       const line=document.createElement('div');line.textContent=cadNew?'成果包已生成；CAD 执行结果见下方。':'成果包已生成。';box.append(line);
-      if(data.download_url){const a=document.createElement('a');a.href=data.download_url;a.textContent='下载本次成果 ZIP ↘';a.addEventListener('click',async e=>{e.preventDefault();try{await downloadURL(data.download_url,`规绘_地块图则_${data.artifact_id || '成果'}.zip`);}catch(err){showNotice(err.message,true);}});box.append(a);}
+      if(data.download_url){const a=document.createElement('a');a.href=data.download_url;a.textContent='下载本次成果 ZIP ↘';a.addEventListener('click',async e=>{e.preventDefault();try{await downloadURL(data.download_url,`清规AI_地块图则_${data.artifact_id || '成果'}.zip`);}catch(err){showNotice(err.message,true);}});box.append(a);}
       if(data.path){const path=document.createElement('div');path.className='muted';path.textContent='保存位置：'+data.path;path.style.overflowWrap='anywhere';box.append(path);}
       if(data.cad){const c=document.createElement('div');c.className='muted';const readable=typeof data.cad==='string'?data.cad:data.cad.status==='saved'?'独立新图已保存。':data.cad.status==='failed_or_unknown'?`未确认落图完成：${data.cad.error || '请在 CAD 中检查当前图纸。'} 请核对后再操作，避免重复新建。`:data.cad.message || data.cad.saved_path || data.cad.path || data.cad.status || '已返回 CAD 操作记录，请核对图纸。';c.textContent='CAD：'+readable;box.append(c);}
       if(Array.isArray(data.files)){const list=document.createElement('div');list.className='file-list';for(const f of data.files){const span=document.createElement('span');span.className='file-chip';span.textContent=typeof f==='string'?f.split(/[\\/]/).pop():f.name || f.filename || f.path?.split(/[\\/]/).pop() || '成果文件';list.append(span);}box.append(list);}
@@ -312,7 +313,7 @@ details.param-details{border:1px solid var(--line);border-radius:9px;background:
   $('confirmBindingBtn').addEventListener('click',async()=>{if(state.busy||state.dirty||!state.bindingCandidate)return;const candidate=state.bindingCandidate;state.spec=candidate.spec;state.spec.attribute_geometry_bindings=JSON.parse(JSON.stringify(candidate.bindings));syncJSON();markDirty();await recompute();if(validResult()&&!state.dirty)status('已按当前几何确认指标归属，结果已重新校核');});
   $('jsonEditor').addEventListener('input',()=>{state.jsonDirty=true;markDirty('完整参数已修改，请重新生成');});
   $('formatJsonBtn').addEventListener('click',()=>{try{const draft=readJSON();$('jsonEditor').value=JSON.stringify(draft,null,2);showNotice('');}catch(err){showNotice('JSON 格式有误：'+err.message,true);}});
-  $('saveJsonBtn').addEventListener('click',()=>{try{if(state.attributeDirty)captureAttributeInputs();if(state.roadDirty)captureRoadInputs();const draft=readJSON();saveBlob(new Blob([JSON.stringify(draft,null,2)],{type:'application/json;charset=utf-8'}),'规绘_地块参数.json');}catch(err){showNotice('参数有误：'+err.message,true);}});
+  $('saveJsonBtn').addEventListener('click',()=>{try{if(state.attributeDirty)captureAttributeInputs();if(state.roadDirty)captureRoadInputs();const draft=readJSON();saveBlob(new Blob([JSON.stringify(draft,null,2)],{type:'application/json;charset=utf-8'}),'清规AI_地块参数.json');}catch(err){showNotice('参数有误：'+err.message,true);}});
   $('mapTab').addEventListener('click',()=>{if(state.busy)return;state.view='map';renderDrawing();});$('sheetTab').addEventListener('click',showSheet);
   $('exportBtn').addEventListener('click',()=>exportPackage(false));$('cadBtn').addEventListener('click',()=>exportPackage(true));
   function zoom(v){state.zoom=Math.max(1,Math.min(3,v));$('zoomLabel').textContent=Math.round(state.zoom*100)+'%';renderDrawing();}

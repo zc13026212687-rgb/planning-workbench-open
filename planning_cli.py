@@ -4,7 +4,7 @@ from pathlib import Path
 ROOT=Path(__file__).resolve().parent
 
 def main(argv=None):
-    p=argparse.ArgumentParser(description='规绘独立规划 CAD 技能（与桌面共用引擎）')
+    p=argparse.ArgumentParser(description='清规AI · PlanningWorkbench Open 0.2.0 独立规划 CAD 技能')
     sub=p.add_subparsers(dest='command',required=True)
     sub.add_parser('cases')
     q=sub.add_parser('library');q.add_argument('query',nargs='?',default='');q.add_argument('--limit',type=int,default=20)

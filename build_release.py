@@ -10,16 +10,17 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent
 VERSION = "0.2.0"
-BLOCKED_PARTS = {".venv", "node_modules", "data", "evidence", "bin", "obj", "__pycache__", ".git", ".pytest_cache", "publish", "releases"}
+BLOCKED_PARTS = {".venv", "runtime", "node_modules", "data", "evidence", "bin", "obj", "__pycache__", ".git", ".pytest_cache", "publish", "releases"}
 BLOCKED_NAMES = {"source-manifest.json", "local-engine.json", "server.json", ".env"}
 SOURCE_FOLDERS = {
     "app": {".py"}, "skills": {".py", ".json", ".md", ".yaml", ".yml"},
     "references": {".json", ".md"}, "tests": {".py", ".json"},
     "examples": {".json", ".md"}, "docs": {".md", ".py"},
 }
-BASE_NAMES = ["planning_cli.py", "planning_mcp.py", "requirements.lock.txt", "LICENSE", "README.md",
-              "build_release.py", "install_skills.py", ".gitignore"]
-FULL_NAMES = ["run_server.py", "启动规绘.cmd", "检查与安装依赖.cmd", "desktop/Setup.ps1",
+BASE_NAMES = ["planning_cli.py", "planning_mcp.py", "requirements.lock.txt", "pytest.ini", "LICENSE", "README.md",
+              "build_release.py", "build_windows_portable.py", "install_skills.py", ".gitignore"]
+FULL_NAMES = ["run_server.py", "启动清规AI.cmd", "安装清规AI.cmd",
+              "desktop/InstallQingGui.ps1", "desktop/LaunchQingGui.ps1", "启动规绘.cmd", "检查与安装依赖.cmd", "desktop/Setup.ps1",
               "启动地块与图则.cmd", "desktop/LaunchRegulatory.ps1", "web/regulatory.html", "web/package.json",
               "web/package-lock.json", "web/tsconfig.json", "web/vite.config.ts", "web/index.html"]
 
@@ -63,7 +64,8 @@ def build(output: Path):
         required = {"planning_mcp.py", "examples/regulatory-parcels.json", "skills/regulatory-suite/SKILL.md",
                     "docs/mcp-usage.md", "docs/release-0.2.0.md", "docs/open-implementation.md"}
         if not standalone:
-            required.update({"web/regulatory.html", "启动地块与图则.cmd", "desktop/LaunchRegulatory.ps1"})
+            required.update({"web/regulatory.html", "启动地块与图则.cmd", "desktop/LaunchRegulatory.ps1",
+                             "启动清规AI.cmd", "安装清规AI.cmd", "desktop/InstallQingGui.ps1", "desktop/LaunchQingGui.ps1"})
         missing = required - {relative for relative, _ in contents}
         if missing:
             raise ValueError("Release is missing required source files: " + ", ".join(sorted(missing)))

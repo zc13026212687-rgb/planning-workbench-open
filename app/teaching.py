@@ -223,5 +223,5 @@ def assignment_bytes(store,job_id):
                         'dwg_bytes_reopened_and_verified':False})
         put('cad-snapshots.json',{'job_id':job_id,'snapshots':snapshots,
             'note':'保存审计回读的对照，打包时未重新打开 DWG 核验；job_id 不证明几何一致。'})
-        z.writestr('READ-ME.txt',f"规绘作业包\n数据为 {'synthetic 教学样例' if job.get('synthetic') else '用户导入，来源由用户核实'}。\n任务状态：{job['status']}\nparameters.json 和 drawing.dxf 对应计算任务；DWG 是 CAD 保存时的快照，可能因人工编辑、修改后撤销等操作与该任务不同。\ncad-snapshots.json 对每份 DWG 记录实际保存回读及 matched（记录几何一致）/different（存在差异）/unknown（证据不足）状态，并列出匹配、变化、缺失、额外和无法核验的实体数量；同一 job_id 不代表已匹配。\n对照包含坐标、Z、法向、bulge、文字内容和图层；采用固定绝对浮点容差与圆弧角度同义判断，不检查字体、颜色或视图。以上是保存审计回读的对照，打包时未重新打开 DWG 核验。\n无CAD保存记录时不包含DWG；DXF为可编辑成果。\n检查结果不代替教师审图。模型未知用量和成本保留空值。\n")
+        z.writestr('READ-ME.txt',f"清规AI · PlanningWorkbench Open 0.2.0 作业包\n数据为 {'synthetic 教学样例' if job.get('synthetic') else '用户导入，来源由用户核实'}。\n任务状态：{job['status']}\nparameters.json 和 drawing.dxf 对应计算任务；DWG 是 CAD 保存时的快照，可能因人工编辑、修改后撤销等操作与该任务不同。\ncad-snapshots.json 对每份 DWG 记录实际保存回读及 matched（记录几何一致）/different（存在差异）/unknown（证据不足）状态，并列出匹配、变化、缺失、额外和无法核验的实体数量；同一 job_id 不代表已匹配。\n对照包含坐标、Z、法向、bulge、文字内容和图层；采用固定绝对浮点容差与圆弧角度同义判断，不检查字体、颜色或视图。以上是保存审计回读的对照，打包时未重新打开 DWG 核验。\n无CAD保存记录时不包含DWG；DXF为可编辑成果。\n检查结果不代替教师审图。模型未知用量和成本保留空值。\n")
     return buffer.getvalue()
